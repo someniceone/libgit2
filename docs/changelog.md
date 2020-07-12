@@ -1,3 +1,10 @@
+vNext
+-----
+
+### Breaking CMake configuration changes
+
+The `MVSC_CRTDBG` configuration option is now `WIN32_LEAKCHECK`.
+
 v1.1
 ----
 
