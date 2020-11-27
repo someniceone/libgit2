@@ -5,3 +5,7 @@ build/
 tags
 CMakeSettings.json
 .vs
+.history/
+.idea/
+.vscode/
+Testing/
