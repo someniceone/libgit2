@@ -72,8 +72,13 @@ int merge_commits_from_branches(
 	git_buf_printf(&branch_buf, "%s%s", GIT_REFS_HEADS_DIR, theirs_name);
 	cl_git_pass(git_reference_name_to_id(&their_oid, repo, branch_buf.ptr));
 	cl_git_pass(git_commit_lookup(&their_commit, repo, &their_oid));
-
-	error = git_merge_commits(index, repo, our_commit, their_commit, opts);
+	git_conflict test;
+	test.length=0;
+	error = git_merge_commits(index, repo,&test,  our_commit, their_commit, opts);
+	if (test.length>0){
+		printf("out:[length:%ld path:%s]",test.length,test.diffs[0].our_entry.path);
+		// printf("out:[length:%ld uid:%d]",test.length,test.diffs[0].our_entry.uid);
+	}
 
 	git_buf_dispose(&branch_buf);
 	git_commit_free(our_commit);

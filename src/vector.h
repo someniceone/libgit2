@@ -24,6 +24,12 @@ typedef struct git_vector {
 	uint32_t flags;
 } git_vector;
 
+// typedef struct git_conflicts{
+// 	size_t len;
+// 	git_merge_diff conflicts[5];
+// 	int error;
+// }git_conflicts;
+
 #define GIT_VECTOR_INIT {0}
 
 int git_vector_init(git_vector *v, size_t initial_size, git_vector_cmp cmp);

@@ -67,6 +67,8 @@ typedef struct git_index_entry {
 	uint16_t flags_extended;
 
 	const char *path;
+
+	// char *save_path;
 } git_index_entry;
 
 /**

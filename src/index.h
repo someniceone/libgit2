@@ -16,6 +16,7 @@
 #include "tree-cache.h"
 #include "git2/odb.h"
 #include "git2/index.h"
+#include "merge.h"
 
 #define GIT_INDEX_FILE "index"
 #define GIT_INDEX_FILE_MODE 0666
@@ -54,6 +55,13 @@ struct git_index {
 
 	unsigned int version;
 };
+
+
+struct git_conflict{
+	git_merge_diff *diffs;
+	size_t length;
+};
+
 
 struct git_index_iterator {
 	git_index *index;

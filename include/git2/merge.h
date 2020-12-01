@@ -572,6 +572,7 @@ GIT_EXTERN(int) git_merge_trees(
 GIT_EXTERN(int) git_merge_commits(
 	git_index **out,
 	git_repository *repo,
+	git_conflict *conflicts_out,
 	const git_commit *our_commit,
 	const git_commit *their_commit,
 	const git_merge_options *opts);

@@ -161,6 +161,7 @@ int git_merge__iterators(
 	git_iterator *ancestor_iter,
 	git_iterator *our_iter,
 	git_iterator *their_iter,
+	git_conflict *conflicts_out,
 	const git_merge_options *given_opts);
 
 int git_merge__check_result(git_repository *repo, git_index *index_new);

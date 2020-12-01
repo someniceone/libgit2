@@ -46,7 +46,6 @@ static void test_find_differences(
     git_tree *ancestor_tree, *ours_tree, *theirs_tree;
 	git_iterator *ancestor_iter, *ours_iter, *theirs_iter;
 	git_iterator_options iter_opts = GIT_ITERATOR_OPTIONS_INIT;
-
 	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
 	opts.flags |= GIT_MERGE_FIND_RENAMES;
 	opts.target_limit = 1000;
@@ -93,7 +92,6 @@ static void test_find_differences(
 	git_tree_free(ancestor_tree);
 	git_tree_free(ours_tree);
 	git_tree_free(theirs_tree);
-
 	git_merge_diff_list__free(merge_diff_list);
 
 	git__free(opts.metric);
