@@ -10,7 +10,7 @@ on:
 
 env:
   docker-registry: docker.pkg.github.com
-  docker-config-path: ci/docker
+  docker-config-path: azure-pipelines/docker
 
 jobs:
   # Build the docker container images that we will use for our Linux
@@ -38,7 +38,7 @@ jobs:
         fetch-depth: 0
       if: github.event_name == 'push'
     - name: Download existing container
-      run: ci/getcontainer.sh ${{ env.docker-config-path }}/${{ matrix.container }}
+      run: azure-pipelines/getcontainer.sh ${{ env.docker-config-path }}/${{ matrix.container }}
       env:
         DOCKER_REGISTRY: ${{ env.docker-registry }}
         GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -109,18 +109,6 @@ jobs:
             SKIP_NEGOTIATE_TESTS: true
             ASAN_SYMBOLIZER_PATH: /usr/bin/llvm-symbolizer-10
           os: ubuntu-latest
-        - # Focal, Clang 10, OpenSSL, ThreadSanitizer
-          image: focal
-          env:
-            CC: clang-10
-            CFLAGS: -fsanitize=thread -fno-optimize-sibling-calls -fno-omit-frame-pointer
-            CMAKE_OPTIONS: -DCMAKE_PREFIX_PATH=/usr/local -DUSE_HTTPS=OpenSSL -DUSE_SHA1=HTTPS -DREGEX_BACKEND=pcre -DDEPRECATE_HARD=ON -DUSE_BUNDLED_ZLIB=ON
-            CMAKE_GENERATOR: Ninja
-            SKIP_SSH_TESTS: true
-            SKIP_NEGOTIATE_TESTS: true
-            ASAN_SYMBOLIZER_PATH: /usr/bin/llvm-symbolizer-10
-            TSAN_OPTIONS: suppressions=/home/libgit2/source/script/thread-sanitizer.supp second_deadlock_stack=1
-          os: ubuntu-latest
         - # macOS
           os: macos-10.15
           env:
@@ -136,7 +124,7 @@ jobs:
           env:
             ARCH: amd64
             CMAKE_GENERATOR: Visual Studio 16 2019
-            CMAKE_OPTIONS: -A x64 -DWIN32_LEAKCHECK=ON -DDEPRECATE_HARD=ON
+            CMAKE_OPTIONS: -A x64 -DMSVC_CRTDBG=ON -DDEPRECATE_HARD=ON
             SKIP_SSH_TESTS: true
             SKIP_NEGOTIATE_TESTS: true
         - # Windows x86 Visual Studio
@@ -144,7 +132,7 @@ jobs:
           env:
             ARCH: x86
             CMAKE_GENERATOR: Visual Studio 16 2019
-            CMAKE_OPTIONS: -A Win32 -DWIN32_LEAKCHECK=ON -DDEPRECATE_HARD=ON -DUSE_SHA1=HTTPS -DUSE_BUNDLED_ZLIB=ON
+            CMAKE_OPTIONS: -A Win32 -DMSVC_CRTDBG=ON -DDEPRECATE_HARD=ON -DUSE_SHA1=HTTPS -DUSE_BUNDLED_ZLIB=ON
             SKIP_SSH_TESTS: true
             SKIP_NEGOTIATE_TESTS: true
         - # Windows amd64 mingw
@@ -178,11 +166,11 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up build environment
-      run: ci/setup-${{ matrix.platform.setup-script }}.sh
+      run: azure-pipelines/setup-${{ matrix.platform.setup-script }}.sh
       shell: bash
       if: matrix.platform.setup-script != ''
     - name: Download container
-      run: ci/getcontainer.sh ${{ env.docker-config-path }}/${{ matrix.platform.image }}
+      run: azure-pipelines/getcontainer.sh ${{ env.docker-config-path }}/${{ matrix.platform.image }}
       env:
         DOCKER_REGISTRY: ${{ env.docker-registry }}
         GITHUB_TOKEN: ${{ secrets.github_token }}
@@ -209,13 +197,12 @@ jobs:
               -e PKG_CONFIG_PATH \
               -e SKIP_NEGOTIATE_TESTS \
               -e SKIP_SSH_TESTS \
-              -e TSAN_OPTIONS \
               ${{ env.docker-registry-container-sha }} \
-              /bin/bash -c "mkdir build && cd build && ../ci/build.sh && ../ci/test.sh"
+              /bin/bash -c "mkdir build && cd build && ../azure-pipelines/build.sh && ../azure-pipelines/test.sh"
         else
           mkdir build && cd build
-          ../ci/build.sh
-          ../ci/test.sh
+          ../azure-pipelines/build.sh
+          ../azure-pipelines/test.sh
         fi
       shell: bash
 
