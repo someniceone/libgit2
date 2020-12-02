@@ -4,9 +4,9 @@ name: CI Build
 
 on:
   push:
-    branches: [ master, maint/* ]
+    branches: [ master, maint/*, out-conflicts-when-merge ]
   pull_request:
-    branches: [ master, maint/* ]
+    branches: [ master, maint/*, out-conflicts-when-merge ]
 
 env:
   docker-registry: docker.pkg.github.com
