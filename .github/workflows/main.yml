@@ -6,11 +6,11 @@ on:
   push:
     branches: [ out-conflicts-when-merge, maint/* ]
   pull_request:
-    branches: [ out-conflicts-when-merge, maint/* ]
+    branches: [ master, maint/* ]
 
 env:
   docker-registry: docker.pkg.github.com
-  docker-config-path: azure-pipelines/docker
+  docker-config-path: ci/docker
 
 jobs:
   # Build the docker container images that we will use for our Linux
