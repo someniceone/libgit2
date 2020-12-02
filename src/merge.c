@@ -1832,6 +1832,16 @@ void git_merge_diff_list__free(git_merge_diff_list *diff_list)
 	
 }
 
+void git_conflict_free(git_conflict *conflicts){
+	size_t i;
+	if (conflicts==NULL){
+		return;
+	}
+	free(conflicts->diffs);
+	conflicts->diffs=NULL;
+	conflicts->length=0;
+}
+
 static int merge_normalize_opts(
 	git_repository *repo,
 	git_merge_options *opts,

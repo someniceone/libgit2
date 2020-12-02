@@ -147,6 +147,8 @@ int git_merge_diff_list__find_renames(git_repository *repo, git_merge_diff_list 
 
 void git_merge_diff_list__free(git_merge_diff_list *diff_list);
 
+void git_conflict_free(git_conflict *conflicts);
+
 /* Merge metadata setup */
 
 int git_merge__setup(

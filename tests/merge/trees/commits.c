@@ -117,6 +117,8 @@ void test_merge_trees_commits__conflicts_automerge(void)
 	cl_assert(merge_test_conflicts(conflicts,paths,3,1));
 
 	git_index_free(index);
+	git_conflict_free(&conflicts);
+
 }
 
 void test_merge_trees_commits__conflicts_no_ancestor(void)
@@ -140,6 +142,7 @@ void test_merge_trees_commits__conflicts_no_ancestor(void)
 	cl_assert(merge_test_conflicts(conflicts,paths,4,2));
 
 	git_index_free(index);
+	git_conflict_free(&conflicts);
 }
 
 void test_merge_trees_commits__df_conflict(void)

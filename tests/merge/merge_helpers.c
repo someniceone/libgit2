@@ -290,7 +290,7 @@ int merge_test_index(git_index *index, const struct merge_index_entry expected[]
 
 int merge_test_conflicts(git_conflict conflicts,const struct merge_conflict_path expected[],size_t expected_paths_len,size_t expected_conflicts_len){
 	size_t i,j;
-	int result=1;
+	
 	if (conflicts.length!=expected_conflicts_len){
 		return 0;
 	}
@@ -321,11 +321,11 @@ int merge_test_conflicts(git_conflict conflicts,const struct merge_conflict_path
 		}
 
 		if (flag){
-			return result=0;
+			return 0;
 		}
 	}
 
-	return result;
+	return 1;
 	
 }
 
