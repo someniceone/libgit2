@@ -10,7 +10,7 @@ on:
 
 env:
   docker-registry: docker.pkg.github.com
-  docker-config-path: ci/docker
+  docker-config-path: azure-pipelines/docker
 
 jobs:
   # Build the docker container images that we will use for our Linux
