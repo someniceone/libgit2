@@ -2069,7 +2069,6 @@ int git_merge__iterators(
 	size_t i;
 	size_t len;
 	git_merge_diff *diffs;
-	// char *our_path;
 	
 	
 	int error = 0;
@@ -2129,45 +2128,18 @@ int git_merge__iterators(
 		conflicts_out->length=0;
 		conflicts_out->diffs=NULL;
 		len = diff_list->conflicts.length;
+
 		if (len>0){
-			printf("inner_length:%ld",len);
 			diffs = malloc(sizeof(git_merge_diff) * len);
 			i=0;
 			git_vector_foreach(&(diff_list->conflicts),i,conflict){
-			printf("[t1:%d ",conflict->type);
 			memcpy(&diffs[i], conflict, sizeof(git_merge_diff));
-		
-			// int our_path_length=0;
-			// if (diffs[i].our_entry.path!=NULL){
-			// 	our_path_length= strlen(diffs[i].our_entry.path);
-			// 	our_path=malloc(sizeof(char)*our_path_length);
-			// 	memcpy(our_path,diffs[i].our_entry.path,sizeof(char)*our_path_length);
-			// }else{
-			// 	char nil[1]="";
-			// 	our_path=&nil;
-			// }
-
-
-			// printf("%s:%d ",diffs[i].our_entry.path,sizeof(diffs[i].our_entry.path));
-		
-			// strcpy(our_path,diffs[i].our_entry.path);
-			printf("t2:%d]",diffs[i].type);
-			// printf("[%d,%s]",strlen(diffs[i].our_entry.path),diffs[i].our_entry.path);
-			// printf("%p:%p",diffs[i].our_entry.path,diffs[i].our_entry.save_path);
-
-			// printf("our_path:[%s:%p] ",our_path,our_path);
-
-			// diffs[i].our_entry.save_path=our_path;
-			// printf("path:[%p:%p]",diffs[i].our_entry.path,diffs[i].our_entry.save_path);
-
-		}
-			printf("t4:[%d] uid:%d",diffs[0].type,diffs[0].our_entry.uid);
+			}
 			conflicts_out->diffs=diffs;
 			conflicts_out->length=len;
 		}
 	}
 	
-
 	error = index_from_diff_list(out, diff_list,
 		(opts.flags & GIT_MERGE_SKIP_REUC));
 
@@ -2178,7 +2150,6 @@ done:
 		git__free(opts.metric);
 
 	git__free((char *)opts.default_driver);
-
 	git_merge_diff_list__free(diff_list);
 	git_iterator_free(empty_ancestor);
 	git_iterator_free(empty_ours);
@@ -2431,8 +2402,7 @@ static int merge_annotated_commits(
 
 		git_error_clear();
 	}
-	// git_conflict test;
-	// conflicts_out->length=0;
+
 	if ((error = iterator_for_annotated_commit(&base_iter, base)) < 0 ||
 		(error = iterator_for_annotated_commit(&our_iter, ours)) < 0 ||
 		(error = iterator_for_annotated_commit(&their_iter, theirs)) < 0 ||
@@ -2444,15 +2414,11 @@ static int merge_annotated_commits(
 		*base_out = base;
 		base = NULL;
 	}
-	// if (test.length!=NULL&&test.length>0){
-	// 	printf("out:[length:%ld path:%s]",test.length,test.diffs[0].our_entry.save_path);
-	// }
-	
+
 
 done:
 	
 	git_annotated_commit_free(base);
-	
 	git_iterator_free(base_iter);
 	git_iterator_free(our_iter);
 	git_iterator_free(their_iter);
@@ -2462,7 +2428,7 @@ done:
 }
 
 
-int git_merge_commits(
+int git_merge_commits_out_conflicts(
 	git_index **out,
 	git_repository *repo,
 	git_conflict *conflicts_out,
@@ -2475,19 +2441,39 @@ int git_merge_commits(
 	if ((error = git_annotated_commit_from_commit(&ours, (git_commit *)our_commit)) < 0 ||
 		(error = git_annotated_commit_from_commit(&theirs, (git_commit *)their_commit)) < 0)
 		goto done;
-	// git_conflict test;
-	// test.length=0;
+	
 	error = merge_annotated_commits(out, &base, repo, ours, theirs, 0,conflicts_out, opts);
-	// if (test.length>0){
-	// 	printf("out:[length:%ld path:%s]",test.length,test.diffs[0].our_entry.path);
-	// 	// printf("out:[length:%ld uid:%d]",test.length,test.diffs[0].our_entry.uid);
-	// }
+	
 done:
 	git_annotated_commit_free(ours);
 	git_annotated_commit_free(theirs);
 	git_annotated_commit_free(base);
 	return error;
 }
+
+int git_merge_commits(
+	git_index **out,
+	git_repository *repo,
+	const git_commit *our_commit,
+	const git_commit *their_commit,
+	const git_merge_options *opts)
+{
+	git_annotated_commit *ours = NULL, *theirs = NULL, *base = NULL;
+	int error = 0;
+	if ((error = git_annotated_commit_from_commit(&ours, (git_commit *)our_commit)) < 0 ||
+		(error = git_annotated_commit_from_commit(&theirs, (git_commit *)their_commit)) < 0)
+		goto done;
+
+	error = merge_annotated_commits(out, &base, repo, ours, theirs, 0,NULL, opts);
+	
+done:
+	git_annotated_commit_free(ours);
+	git_annotated_commit_free(theirs);
+	git_annotated_commit_free(base);
+	return error;
+}
+
+
 
 /* Merge setup / cleanup */
 

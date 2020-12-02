@@ -1,9 +1,12 @@
 #include "clar_libgit2.h"
+#include "index.h"
+#include "../../../src/index.h"
 #include "git2/repository.h"
 #include "git2/merge.h"
 #include "merge.h"
 #include "../merge_helpers.h"
 #include "../conflict_data.h"
+
 
 static git_repository *repo;
 
@@ -91,6 +94,50 @@ void test_merge_trees_commits__no_ancestor(void)
 	cl_git_pass(merge_commits_from_branches(&index, repo, "master", "unrelated", &opts));
 
 	cl_assert(merge_test_index(index, merge_index_entries, 11));
+
+	git_index_free(index);
+}
+
+void test_merge_trees_commits__conflicts_automerge(void)
+{
+	git_index *index;
+	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
+	git_conflict conflicts;
+
+	struct merge_conflict_path paths[]={
+		{1,"conflicting.txt"},
+		{2,"conflicting.txt"},
+		{3,"conflicting.txt"},
+	};
+	conflicts.length=0;
+
+
+	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "branch", &opts));
+	
+	cl_assert(merge_test_conflicts(conflicts,paths,3,1));
+
+	git_index_free(index);
+}
+
+void test_merge_trees_commits__conflicts_no_ancestor(void)
+{
+	git_index *index;
+	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
+	git_conflict conflicts;
+	
+	struct merge_conflict_path paths[]={
+		{2,"automergeable.txt"},
+		{3,"automergeable.txt"},
+		{2,"conflicting.txt"},
+		{3,"conflicting.txt"},
+	
+	};
+	conflicts.length=0;
+
+
+	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "unrelated", &opts));
+
+	cl_assert(merge_test_conflicts(conflicts,paths,4,2));
 
 	git_index_free(index);
 }

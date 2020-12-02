@@ -17,6 +17,12 @@ struct merge_name_entry {
 	char their_path[128];
 };
 
+struct merge_conflict_path{
+	int stage;
+	char path[128];
+};
+
+
 struct merge_index_with_status {
 	struct merge_index_entry entry;
 	unsigned int status;
@@ -49,6 +55,12 @@ int merge_commits_from_branches(
 	const char *ours_name, const char *theirs_name,
 	git_merge_options *opts);
 
+int merge_commits_from_branches_out_conflicts(
+	git_index **index, git_repository *repo,
+	git_conflict *conflicts_out,
+	const char *ours_name, const char *theirs_name,
+	git_merge_options *opts);
+
 int merge_branches(git_repository *repo,
 	const char *ours_branch, const char *theirs_branch,
 	git_merge_options *merge_opts, git_checkout_options *checkout_opts);
@@ -58,6 +70,8 @@ int merge_test_diff_list(git_merge_diff_list *diff_list, const struct merge_inde
 int merge_test_merge_conflicts(git_vector *conflicts, const struct merge_index_conflict_data expected[], size_t expected_len);
 
 int merge_test_index(git_index *index, const struct merge_index_entry expected[], size_t expected_len);
+
+int merge_test_conflicts(git_conflict conflicts,const struct merge_conflict_path expected[],size_t expected_paths_len ,size_t expected_conflicts_len);
 
 int merge_test_names(git_index *index, const struct merge_name_entry expected[], size_t expected_len);
 
