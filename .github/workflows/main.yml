@@ -38,7 +38,8 @@ jobs:
         fetch-depth: 0
       if: github.event_name == 'push'
     - name: Download existing container
-      run: ci/getcontainer.sh ${{ env.docker-config-path }}/${{ matrix.container }}
+      run: azure-pipelines/getcontainer.sh ${{ env.docker-config-path }}/${{ matrix.container }}
+      # run: ci/getcontainer.sh ${{ env.docker-config-path }}/${{ matrix.container }}
       env:
         DOCKER_REGISTRY: ${{ env.docker-registry }}
         GITHUB_TOKEN: ${{ secrets.github_token }}
