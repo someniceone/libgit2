@@ -121,7 +121,7 @@ void test_merge_trees_commits__conflicts_automerge(void)
 
 	printf("[1ok]");
 
-	// cl_assert(merge_test_conflicts(&conflicts,paths,3,1));
+	cl_assert(merge_test_conflicts(&conflicts,paths,3,1));
 
 	printf("[2ok]");
 
