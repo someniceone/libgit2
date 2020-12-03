@@ -2139,7 +2139,8 @@ int git_merge__iterators(
 		len = diff_list->conflicts.length;
 
 		if (len>0){
-			diffs = malloc(sizeof(git_merge_diff) * len);
+			// diffs = malloc(sizeof(git_merge_diff) * len);
+			diffs = calloc(len,sizeof(git_merge_diff));
 			i=0;
 			git_vector_foreach(&(diff_list->conflicts),i,conflict){
 			memcpy(&diffs[i], conflict, sizeof(git_merge_diff));
