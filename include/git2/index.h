@@ -68,7 +68,7 @@ typedef struct git_index_entry {
 
 	const char *path;
 
-	// char *save_path;
+	char *save_path;
 } git_index_entry;
 
 /**

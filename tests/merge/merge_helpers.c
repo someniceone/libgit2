@@ -301,24 +301,19 @@ int merge_test_conflicts(git_conflict *conflicts,const struct merge_conflict_pat
 			switch (expected[i].stage)
 			{
 			case 1:
-				printf("[case 1]");
-				// printf("[%s]",conflicts->diffs[j].ancestor_entry.path);
-				if (strcmp(expected[i].path,"expected[i].path")!=0){
-					printf("strcmp>>>");
-				}
-				// if (strcmp(expected[i].path,conflicts->diffs[j].ancestor_entry.path)==0){
+				if (strcmp(expected[i].path,conflicts->diffs[j].ancestor_entry.save_path)==0){
 					flag=0;
-				// }
+				}
 				break;
 			case 2:
-				// if (strcmp(expected[i].path,conflicts->diffs[j].our_entry.path)==0){
+				if (strcmp(expected[i].path,conflicts->diffs[j].our_entry.save_path)==0){
 					flag=0;
-				// }
+				}
 				break;
 			case 3:
-				// if (strcmp(expected[i].path,conflicts->diffs[j].their_entry.path)==0){
+				if (strcmp(expected[i].path,conflicts->diffs[j].their_entry.save_path)==0){
 					flag=0;
-				// }
+				}
 				break;
 			default:
 				break;

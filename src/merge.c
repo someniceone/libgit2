@@ -1833,9 +1833,21 @@ void git_merge_diff_list__free(git_merge_diff_list *diff_list)
 }
 
 void git_conflict_free(git_conflict *conflicts){
+	size_t i;
+
 	if (conflicts==NULL){
 		return;
 	}
+
+	for (i=0;i<conflicts->length;i++){
+		free(conflicts->diffs[i].ancestor_entry.save_path);
+		free(conflicts->diffs[i].our_entry.save_path);
+		free(conflicts->diffs[i].their_entry.save_path);
+		conflicts->diffs[i].ancestor_entry.save_path=NULL;
+		conflicts->diffs[i].our_entry.save_path=NULL;
+		conflicts->diffs[i].their_entry.save_path=NULL;
+	}
+
 	free(conflicts->diffs);
 	conflicts->diffs=NULL;
 	conflicts->length=0;
@@ -2078,8 +2090,12 @@ int git_merge__iterators(
 	size_t i;
 	size_t len;
 	git_merge_diff *diffs;
-	
-	
+	char *our_path;
+	char *their_path;
+	char *ancestor_path;
+
+
+
 	int error = 0;
 
 	assert(out && repo);
@@ -2144,7 +2160,38 @@ int git_merge__iterators(
 			diffs = calloc(len,sizeof(git_merge_diff));
 			i=0;
 			git_vector_foreach(&(diff_list->conflicts),i,conflict){
+			// printf("before:%p",conflict->our_entry.path);
 			memcpy(&diffs[i], conflict, sizeof(git_merge_diff));
+			// printf("after:%p",diffs[i].our_entry.path);
+
+			if (diffs[i].our_entry.path!=NULL){
+				our_path=calloc(strlen(diffs[i].our_entry.path),sizeof(char));
+				memcpy(our_path,diffs[i].our_entry.path,sizeof(char)*strlen(diffs[i].our_entry.path));
+			}else{
+				our_path=calloc(1,sizeof(char));
+			}
+
+			if (diffs[i].their_entry.path!=NULL){
+				their_path=calloc(strlen(diffs[i].their_entry.path),sizeof(char));
+				memcpy(their_path,diffs[i].their_entry.path,sizeof(char)*strlen(diffs[i].their_entry.path));
+			}else{
+				their_path=calloc(1,sizeof(char));
+			}
+
+			if (diffs[i].ancestor_entry.path!=NULL){
+				ancestor_path=calloc(strlen(diffs[i].ancestor_entry.path),sizeof(char));
+				memcpy(ancestor_path,diffs[i].ancestor_entry.path,sizeof(char)*strlen(diffs[i].ancestor_entry.path));
+			}else{
+				ancestor_path=calloc(1,sizeof(char));
+			}
+
+			diffs[i].our_entry.save_path=our_path;
+			diffs[i].their_entry.save_path=their_path;
+			diffs[i].ancestor_entry.save_path=ancestor_path;
+			// printf("path1:[%p:%p]",diffs[i].our_entry.path,diffs[i].our_entry.save_path);
+			// printf("path2:[%p:%p]",diffs[i].their_entry.path,diffs[i].their_entry.save_path);
+			// printf("path3:[%p:%p]",diffs[i].ancestor_entry.path,diffs[i].ancestor_entry.save_path);
+
 			}
 			conflicts_out->diffs=diffs;
 			conflicts_out->length=len;
