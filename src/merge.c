@@ -2090,7 +2090,7 @@ int git_merge__iterators(
 	size_t i;
 	size_t len;
 	git_merge_diff *diffs;
-	char *our_path;
+	char *our_path=NULL;
 	// char *their_path;
 	// char *ancestor_path;
 
