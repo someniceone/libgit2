@@ -126,7 +126,7 @@ void test_merge_trees_commits__conflicts_automerge(void)
 	printf("[2ok]");
 
 	git_index_free(index);
-	// git_conflict_free(&conflicts);
+	git_conflict_free(&conflicts);
 
 	printf("[3ok]");
 
