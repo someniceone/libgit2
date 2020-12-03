@@ -586,7 +586,7 @@ GIT_EXTERN(int) git_merge_commits(
  *
  * @param out pointer to store the index result in
  * @param repo repository that contains the given trees
- * @param conflicts_out 
+ * @param conflicts_out out conflicts when merge
  * @param our_commit the commit that reflects the destination tree
  * @param their_commit the commit to merge in to `our_commit`
  * @param opts the merge tree options (or null for defaults)
