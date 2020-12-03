@@ -2090,7 +2090,7 @@ int git_merge__iterators(
 	size_t i;
 	size_t len;
 	git_merge_diff *diffs;
-	// char *our_path;
+	char *our_path;
 	// char *their_path;
 	// char *ancestor_path;
 
@@ -2161,18 +2161,18 @@ int git_merge__iterators(
 			i=0;
 			git_vector_foreach(&(diff_list->conflicts),i,conflict){
 			// printf("before:%p",conflict->our_entry.path);
-			memset(&diffs[i], '0', sizeof(git_merge_diff));
 			memcpy(&diffs[i], conflict, sizeof(git_merge_diff));
 			// printf("after:%p",diffs[i].our_entry.path);
 
-			// if (diffs[i].our_entry.path!=NULL){
-			// 	our_path=calloc(strlen(diffs[i].our_entry.path),sizeof(char));
-			// 	memset(our_path,'0',sizeof(char)*strlen(diffs[i].our_entry.path));
-			// 	memcpy(our_path,diffs[i].our_entry.path,sizeof(char)*strlen(diffs[i].our_entry.path));
-			// }else{
-			// 	our_path=calloc(1,sizeof(char));
-			// 	memset(our_path,'0',sizeof(char));
-			// }
+			if (diffs[i].our_entry.path!=NULL){
+				our_path=calloc(strlen(diffs[i].our_entry.path),sizeof(char));
+				// printf("path:before:%p",our_path);
+				memcpy(our_path,diffs[i].our_entry.path,sizeof(char)*strlen(diffs[i].our_entry.path));
+				// printf("path:after:%p",our_path);
+			}else{
+				our_path=calloc(1,sizeof(char));
+				memset(our_path,'0',sizeof(char));
+			}
 
 
 			// if (diffs[i].their_entry.path!=NULL){
@@ -2199,10 +2199,10 @@ int git_merge__iterators(
 
 
 			
-			diffs[i].our_entry.save_path="conflicting.txt";
+			diffs[i].our_entry.save_path=our_path;
 			diffs[i].their_entry.save_path="conflicting.txt";
 			diffs[i].ancestor_entry.save_path="conflicting.txt";
-			// printf("path1:[%p:%p]",diffs[i].our_entry.path,diffs[i].our_entry.save_path);
+			printf("path1:[%p:%p]",diffs[i].our_entry.path,diffs[i].our_entry.save_path);
 			// printf("path2:[%p:%p]",diffs[i].their_entry.path,diffs[i].their_entry.save_path);
 			// printf("path3:[%p:%p]",diffs[i].ancestor_entry.path,diffs[i].ancestor_entry.save_path);
 
