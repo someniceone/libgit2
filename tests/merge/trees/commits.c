@@ -104,12 +104,13 @@ void test_merge_trees_commits__conflicts_automerge(void)
 	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
 	git_conflict conflicts;
 
-	printf("[mytest]");
 	struct merge_conflict_path paths[]={
 		{1,"conflicting.txt"},
 		{2,"conflicting.txt"},
 		{3,"conflicting.txt"},
 	};
+	
+	printf("[mytest]");
 	printf("[init conflicts.diffs]");
 	conflicts.diffs=NULL;
 	printf("[init conflicts.length]");
