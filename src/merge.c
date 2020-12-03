@@ -2197,6 +2197,7 @@ int git_merge__iterators(
 			// their_path="conflicting.txt";
 			// ancestor_path="conflicting.txt";
 
+
 			
 			diffs[i].our_entry.save_path="conflicting.txt";
 			diffs[i].their_entry.save_path="conflicting.txt";
