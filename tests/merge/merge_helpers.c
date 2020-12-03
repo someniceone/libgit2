@@ -306,13 +306,11 @@ int merge_test_conflicts(git_conflict *conflicts,const struct merge_conflict_pat
 				}
 				break;
 			case 2:
-				printf("%d",strcmp(expected[i].path,conflicts->diffs[j].ancestor_entry.save_path)==0);
+				printf("%d",strcmp(expected[i].path,conflicts->diffs[j].our_entry.save_path));
 				printf("??");
-				if (strcmp(expected[i].path,conflicts->diffs[j].ancestor_entry.save_path)==0){
+				if (strcmp(expected[i].path,conflicts->diffs[j].our_entry.save_path)==0){
 					flag=0;
 					printf(">>>");
-				}else{
-					printf("<<<");
 				}
 				break;
 			case 3:
