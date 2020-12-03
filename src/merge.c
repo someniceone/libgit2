@@ -2091,10 +2091,10 @@ int git_merge__iterators(
 	size_t len;
 	git_merge_diff *diffs;
 	int error = 0;
-	// char our_path[256];
-	// char their_path[256];
-	// char ancestor_path[256];
-	char *our_path;
+	char our_path[256];
+	char their_path[256];
+	char ancestor_path[256];
+	// char *our_path;
 	// char *their_path;
 	// char *ancestor_path;
 	// memset(our_path,'$',sizeof(char));
@@ -2169,17 +2169,31 @@ int git_merge__iterators(
 			// printf("after:%p",diffs[i].our_entry.path);
 
 			if (diffs[i].our_entry.path!=NULL){
-				our_path=calloc(strlen(diffs[i].our_entry.path),sizeof(char));
+				// our_path=calloc(strlen(diffs[i].our_entry.path),sizeof(char));
 				// printf("path:before:%p",our_path);
 				// printf("%s",our_path);
 				// our_path=malloc(sizeof(char)*(strlen(diffs[i].our_entry.path)+1));
-				memset(our_path,0,sizeof(char)*strlen(diffs[i].our_entry.path));
+				// memset(our_path,0,sizeof(char)*strlen(diffs[i].our_entry.path));
 
-				memcpy(our_path,diffs[i].our_entry.path,sizeof(char)*strlen(diffs[i].our_entry.path));
+				memcpy(&our_path,diffs[i].our_entry.path,sizeof(char)*strlen(diffs[i].our_entry.path));
 				// printf("path:after:%p",our_path);
-				printf("%s",our_path);
+				// printf("%s",our_path);
+			}else{
+				memset(&our_path[0],0,sizeof(char)*256);
 			}
 
+			if (diffs[i].their_entry.path!=NULL){
+				memcpy(&their_path,diffs[i].their_entry.path,sizeof(char)*strlen(diffs[i].their_entry.path));
+			}else{
+				memset(&their_path[0],0,sizeof(char)*256);
+			}
+
+			if (diffs[i].ancestor_entry.path!=NULL){
+				memcpy(&ancestor_path,diffs[i].ancestor_entry.path,sizeof(char)*strlen(diffs[i].ancestor_entry.path));
+			}else{
+				memset(&ancestor_path[0],0,sizeof(char)*256);
+			}
+			
 
 			// if (diffs[i].their_entry.path!=NULL){
 			// 	memcpy(&their_path,diffs[i].their_entry.path,sizeof(char)*strlen(diffs[i].their_entry.path));
@@ -2203,9 +2217,9 @@ int git_merge__iterators(
 
 
 			
-			diffs[i].our_entry.save_path=our_path;
-			// diffs[i].their_entry.save_path=&their_path[0];
-			// diffs[i].ancestor_entry.save_path=&ancestor_path[0];
+			diffs[i].our_entry.save_path=&our_path[0];
+			diffs[i].their_entry.save_path=&their_path[0];
+			diffs[i].ancestor_entry.save_path=&ancestor_path[0];
 			// printf("path1:[%p:%p]",diffs[i].our_entry.path,diffs[i].our_entry.save_path);
 			// printf("path2:[%p:%p]",diffs[i].their_entry.path,diffs[i].their_entry.save_path);
 			// printf("path3:[%p:%p]",diffs[i].ancestor_entry.path,diffs[i].ancestor_entry.save_path);
