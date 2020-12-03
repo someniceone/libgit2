@@ -1833,7 +1833,6 @@ void git_merge_diff_list__free(git_merge_diff_list *diff_list)
 }
 
 void git_conflict_free(git_conflict *conflicts){
-	size_t i;
 	if (conflicts==NULL){
 		return;
 	}
