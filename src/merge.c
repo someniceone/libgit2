@@ -1836,6 +1836,9 @@ void git_conflict_free(git_conflict *conflicts){
 	if (conflicts==NULL){
 		return;
 	}
+	if(conflicts->diffs==NULL){
+		return;
+	}
 	free(conflicts->diffs);
 	conflicts->diffs=NULL;
 	conflicts->length=0;
