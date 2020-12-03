@@ -2134,7 +2134,7 @@ int git_merge__iterators(
 	}
 
 	if (conflicts_out!=NULL){
-		printf("[>>>]")
+		printf("[>>>]");
 		conflicts_out->length=0;
 		conflicts_out->diffs=NULL;
 		len = diff_list->conflicts.length;
