@@ -1839,14 +1839,14 @@ void git_conflict_free(git_conflict *conflicts){
 		return;
 	}
 
-	for (i=0;i<conflicts->length;i++){
-		free(conflicts->diffs[i].ancestor_entry.save_path);
-		free(conflicts->diffs[i].our_entry.save_path);
-		free(conflicts->diffs[i].their_entry.save_path);
-		conflicts->diffs[i].ancestor_entry.save_path=NULL;
-		conflicts->diffs[i].our_entry.save_path=NULL;
-		conflicts->diffs[i].their_entry.save_path=NULL;
-	}
+	// for (i=0;i<conflicts->length;i++){
+	// 	free(conflicts->diffs[i].ancestor_entry.save_path);
+	// 	free(conflicts->diffs[i].our_entry.save_path);
+	// 	free(conflicts->diffs[i].their_entry.save_path);
+	// 	conflicts->diffs[i].ancestor_entry.save_path=NULL;
+	// 	conflicts->diffs[i].our_entry.save_path=NULL;
+	// 	conflicts->diffs[i].their_entry.save_path=NULL;
+	// }
 
 	free(conflicts->diffs);
 	conflicts->diffs=NULL;
@@ -2090,9 +2090,9 @@ int git_merge__iterators(
 	size_t i;
 	size_t len;
 	git_merge_diff *diffs;
-	char *our_path;
-	char *their_path;
-	char *ancestor_path;
+	// char *our_path;
+	// char *their_path;
+	// char *ancestor_path;
 
 
 
@@ -2165,38 +2165,42 @@ int git_merge__iterators(
 			memcpy(&diffs[i], conflict, sizeof(git_merge_diff));
 			// printf("after:%p",diffs[i].our_entry.path);
 
-			if (diffs[i].our_entry.path!=NULL){
-				our_path=calloc(strlen(diffs[i].our_entry.path),sizeof(char));
-				memset(our_path,'0',sizeof(char)*strlen(diffs[i].our_entry.path));
-				memcpy(our_path,diffs[i].our_entry.path,sizeof(char)*strlen(diffs[i].our_entry.path));
-			}else{
-				our_path=calloc(1,sizeof(char));
-				memset(our_path,'0',sizeof(char));
-			}
+			// if (diffs[i].our_entry.path!=NULL){
+			// 	our_path=calloc(strlen(diffs[i].our_entry.path),sizeof(char));
+			// 	memset(our_path,'0',sizeof(char)*strlen(diffs[i].our_entry.path));
+			// 	memcpy(our_path,diffs[i].our_entry.path,sizeof(char)*strlen(diffs[i].our_entry.path));
+			// }else{
+			// 	our_path=calloc(1,sizeof(char));
+			// 	memset(our_path,'0',sizeof(char));
+			// }
 
 
-			if (diffs[i].their_entry.path!=NULL){
-				their_path=calloc(strlen(diffs[i].their_entry.path),sizeof(char));
-				memset(their_path,'0',sizeof(char)*strlen(diffs[i].their_entry.path));
-				memcpy(their_path,diffs[i].their_entry.path,sizeof(char)*strlen(diffs[i].their_entry.path));
-			}else{
-				their_path=calloc(1,sizeof(char));
-				memset(their_path,'0',sizeof(char));
-			}
+			// if (diffs[i].their_entry.path!=NULL){
+			// 	their_path=calloc(strlen(diffs[i].their_entry.path),sizeof(char));
+			// 	memset(their_path,'0',sizeof(char)*strlen(diffs[i].their_entry.path));
+			// 	memcpy(their_path,diffs[i].their_entry.path,sizeof(char)*strlen(diffs[i].their_entry.path));
+			// }else{
+			// 	their_path=calloc(1,sizeof(char));
+			// 	memset(their_path,'0',sizeof(char));
+			// }
 		
-			if (diffs[i].ancestor_entry.path!=NULL){
-				ancestor_path=calloc(strlen(diffs[i].ancestor_entry.path),sizeof(char));
-				memset(ancestor_path,'0',sizeof(char)*strlen(diffs[i].ancestor_entry.path));
-				memcpy(ancestor_path,diffs[i].ancestor_entry.path,sizeof(char)*strlen(diffs[i].ancestor_entry.path));
-			}else{
-				ancestor_path=calloc(1,sizeof(char));
-				memset(ancestor_path,'0',sizeof(char));
-			}
+			// if (diffs[i].ancestor_entry.path!=NULL){
+			// 	ancestor_path=calloc(strlen(diffs[i].ancestor_entry.path),sizeof(char));
+			// 	memset(ancestor_path,'0',sizeof(char)*strlen(diffs[i].ancestor_entry.path));
+			// 	memcpy(ancestor_path,diffs[i].ancestor_entry.path,sizeof(char)*strlen(diffs[i].ancestor_entry.path));
+			// }else{
+			// 	ancestor_path=calloc(1,sizeof(char));
+			// 	memset(ancestor_path,'0',sizeof(char));
+			// }
+
+			// our_path="conflicting.txt";
+			// their_path="conflicting.txt";
+			// ancestor_path="conflicting.txt";
 
 			
-			diffs[i].our_entry.save_path=our_path;
-			diffs[i].their_entry.save_path=their_path;
-			diffs[i].ancestor_entry.save_path=ancestor_path;
+			diffs[i].our_entry.save_path="conflicting.txt";
+			diffs[i].their_entry.save_path="conflicting.txt";
+			diffs[i].ancestor_entry.save_path="conflicting.txt";
 			// printf("path1:[%p:%p]",diffs[i].our_entry.path,diffs[i].our_entry.save_path);
 			// printf("path2:[%p:%p]",diffs[i].their_entry.path,diffs[i].their_entry.save_path);
 			// printf("path3:[%p:%p]",diffs[i].ancestor_entry.path,diffs[i].ancestor_entry.save_path);
