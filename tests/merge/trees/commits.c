@@ -98,29 +98,34 @@ void test_merge_trees_commits__no_ancestor(void)
 	git_index_free(index);
 }
 
-// void test_merge_trees_commits__conflicts_automerge(void)
-// {
-// 	git_index *index;
-// 	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
-// 	git_conflict conflicts;
+void test_merge_trees_commits__conflicts_automerge(void)
+{
+	git_index *index;
+	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
+	git_conflict conflicts;
 
-// 	struct merge_conflict_path paths[]={
-// 		{1,"conflicting.txt"},
-// 		{2,"conflicting.txt"},
-// 		{3,"conflicting.txt"},
-// 	};
-// 	conflicts.diffs=NULL;
-// 	conflicts.length=0;
+	struct merge_conflict_path paths[]={
+		{1,"conflicting.txt"},
+		{2,"conflicting.txt"},
+		{3,"conflicting.txt"},
+	};
+	conflicts.diffs=NULL;
+	conflicts.length=0;
 
+	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "branch", &opts));
 
-// 	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "branch", &opts));
-	
-// 	cl_assert(merge_test_conflicts(&conflicts,paths,3,1));
+	printf("[1ok]");
 
-// 	git_index_free(index);
-// 	git_conflict_free(&conflicts);
+	cl_assert(merge_test_conflicts(&conflicts,paths,3,1));
 
-// }
+	printf("[2ok]");
+
+	git_index_free(index);
+	git_conflict_free(&conflicts);
+
+	printf("[3ok]");
+
+}
 
 // void test_merge_trees_commits__conflicts_no_ancestor(void)
 // {
