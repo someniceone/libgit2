@@ -112,6 +112,7 @@ void test_merge_trees_commits__conflicts_automerge(void)
 	conflicts.diffs=NULL;
 	conflicts.length=0;
 
+	printf("[start]")
 	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "branch", &opts));
 
 	printf("[1ok]");
