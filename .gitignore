@@ -5,3 +5,4 @@ build/
 tags
 CMakeSettings.json
 .vs
+.vscode
