@@ -71,7 +71,7 @@ int merge_test_merge_conflicts(git_vector *conflicts, const struct merge_index_c
 
 int merge_test_index(git_index *index, const struct merge_index_entry expected[], size_t expected_len);
 
-int merge_test_conflicts(git_conflict conflicts,const struct merge_conflict_path expected[],size_t expected_paths_len ,size_t expected_conflicts_len);
+int merge_test_conflicts(git_conflict *conflicts,const struct merge_conflict_path expected[],size_t expected_paths_len ,size_t expected_conflicts_len);
 
 int merge_test_names(git_index *index, const struct merge_name_entry expected[], size_t expected_len);
 

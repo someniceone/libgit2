@@ -109,12 +109,13 @@ void test_merge_trees_commits__conflicts_automerge(void)
 		{2,"conflicting.txt"},
 		{3,"conflicting.txt"},
 	};
+	conflicts.diffs=NULL;
 	conflicts.length=0;
 
 
 	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "branch", &opts));
 	
-	cl_assert(merge_test_conflicts(conflicts,paths,3,1));
+	cl_assert(merge_test_conflicts(&conflicts,paths,3,1));
 
 	git_index_free(index);
 	git_conflict_free(&conflicts);
@@ -134,12 +135,13 @@ void test_merge_trees_commits__conflicts_no_ancestor(void)
 		{3,"conflicting.txt"},
 	
 	};
+	conflicts.diffs=NULL;
 	conflicts.length=0;
 
 
 	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "unrelated", &opts));
 
-	cl_assert(merge_test_conflicts(conflicts,paths,4,2));
+	cl_assert(merge_test_conflicts(&conflicts,paths,4,2));
 
 	git_index_free(index);
 	git_conflict_free(&conflicts);
