@@ -105,57 +105,48 @@ void test_merge_trees_commits__conflicts_automerge(void)
 	git_conflict conflicts;
 
 	struct merge_conflict_path paths[]={
-		// {1,"conflicting.txt"},
+		{1,"conflicting.txt"},
 		{2,"conflicting.txt"},
-		// {3,"conflicting.txt"},
+		{3,"conflicting.txt"},
 	};
 	
-	printf("[mytest]");
-	printf("[init conflicts.diffs]");
 	conflicts.diffs=NULL;
-	printf("[init conflicts.length]");
 	conflicts.length=0;
 
-	printf("[start]");
 	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "branch", &opts));
 
-	printf("[1ok]");
-
-	cl_assert(merge_test_conflicts(&conflicts,paths,1,1));
-
-	printf("[2ok]");
+	cl_assert(merge_test_conflicts(&conflicts,paths,3,1));
 
 	git_index_free(index);
 	git_conflict_free(&conflicts);
 
-	printf("[3ok]");
 
 }
 
-// void test_merge_trees_commits__conflicts_no_ancestor(void)
-// {
-// 	git_index *index;
-// 	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
-// 	git_conflict conflicts;
+void test_merge_trees_commits__conflicts_no_ancestor(void)
+{
+	git_index *index;
+	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
+	git_conflict conflicts;
 	
-// 	struct merge_conflict_path paths[]={
-// 		{2,"automergeable.txt"},
-// 		{3,"automergeable.txt"},
-// 		{2,"conflicting.txt"},
-// 		{3,"conflicting.txt"},
+	struct merge_conflict_path paths[]={
+		{2,"automergeable.txt"},
+		{3,"automergeable.txt"},
+		{2,"conflicting.txt"},
+		{3,"conflicting.txt"},
 	
-// 	};
-// 	conflicts.diffs=NULL;
-// 	conflicts.length=0;
+	};
+	conflicts.diffs=NULL;
+	conflicts.length=0;
 
 
-// 	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "unrelated", &opts));
+	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, repo,&conflicts, "master", "unrelated", &opts));
 
-// 	cl_assert(merge_test_conflicts(&conflicts,paths,4,2));
+	cl_assert(merge_test_conflicts(&conflicts,paths,4,2));
 
-// 	git_index_free(index);
-// 	git_conflict_free(&conflicts);
-// }
+	git_index_free(index);
+	git_conflict_free(&conflicts);
+}
 
 void test_merge_trees_commits__df_conflict(void)
 {
