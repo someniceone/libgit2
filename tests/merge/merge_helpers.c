@@ -302,6 +302,7 @@ int merge_test_conflicts(git_conflict *conflicts,const struct merge_conflict_pat
 			{
 			case 1:
 				printf("[case 1]");
+				printf("[%s]",conflicts->diffs[j].ancestor_entry.path);
 				// if (strcmp(expected[i].path,conflicts->diffs[j].ancestor_entry.path)==0){
 					flag=0;
 				// }
