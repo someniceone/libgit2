@@ -6,7 +6,7 @@ on:
   push:
     branches: [ out-conflicts-when-megre, maint/* ]
   pull_request:
-    branches: [ master, maint/* ]
+    branches: [ master1, maint/* ]
 
 env:
   docker-registry: docker.pkg.github.com
