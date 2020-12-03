@@ -100,6 +100,7 @@ void test_merge_trees_commits__no_ancestor(void)
 
 void test_merge_trees_commits__conflicts_automerge(void)
 {
+	printf("[mytest]");
 	git_index *index;
 	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
 	git_conflict conflicts;
@@ -109,7 +110,9 @@ void test_merge_trees_commits__conflicts_automerge(void)
 		{2,"conflicting.txt"},
 		{3,"conflicting.txt"},
 	};
+	printf("[init conflicts.diffs]");
 	conflicts.diffs=NULL;
+	printf("[init conflicts.length]");
 	conflicts.length=0;
 
 	printf("[start]");
