@@ -45,8 +45,8 @@ jobs:
       if: github.event_name == 'push'
     - name: Build and publish image
       run: |
-        docker build -t ${{ env.docker-registry }}/${{ github.repository }}/${{ matrix.container }}:v1 --build-arg BASE=${{ matrix.container.base }} -f ${{ matrix.container }} .
-        docker push ${{ env.docker-registry }}/${{ github.repository }}/${{ matrix.container }}:v1
+        docker build -t ${{ env.docker-registry }}/${{ github.repository }}/${{ matrix.container }}  --build-arg BASE=${{ matrix.container.base }} -f ${{ matrix.container }} .
+        docker push ${{ env.docker-registry }}/${{ github.repository }}/${{ matrix.container }}
       working-directory: ${{ env.docker-config-path }}
       if: github.event_name == 'push' 
       # && env.docker-container-exists != 'true'
@@ -231,7 +231,7 @@ jobs:
             --rm \
             -v "$(pwd):/home/libgit2/source" \
             -w /home/libgit2/source \
-            ${{ env.docker-registry }}/${{ github.repository }}/docurium:v1 \
+            ${{ env.docker-registry }}/${{ github.repository }}/docurium:latest \
             cm doc api.docurium
         git checkout gh-pages
         zip --exclude .git/\* --exclude .gitignore --exclude .gitattributes -r api-documentation.zip .
