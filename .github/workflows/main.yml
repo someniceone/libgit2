@@ -46,7 +46,7 @@ jobs:
     - name: Build and publish image
       run: |
         docker build -t ${{ env.docker-registry }}/${{ github.repository }}/${{ matrix.container }}:v1 --build-arg BASE=${{ matrix.container.base }} -f ${{ matrix.container }} .
-        docker push ${{ env.docker-registry-container-sha }}
+        docker push ${{ env.docker-registry }}/${{ github.repository }}/${{ matrix.container }}:v1
       working-directory: ${{ env.docker-config-path }}
       if: github.event_name == 'push' 
       # && env.docker-container-exists != 'true'
