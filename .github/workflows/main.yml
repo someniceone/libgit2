@@ -230,7 +230,9 @@ jobs:
             --rm \
             -v "$(pwd):/home/libgit2/source" \
             -w /home/libgit2/source \
-            libgit2/libgit2/docurium:latest \
+            ${{ env.docker-registry }}/${{ github.repository }}/docurium:latest \
+            cm doc api.docurium \
+            ${{ env.docker-registry }}/${{ github.repository }}/docurium:latest \
             cm doc api.docurium
         git checkout gh-pages
         zip --exclude .git/\* --exclude .gitignore --exclude .gitattributes -r api-documentation.zip .
