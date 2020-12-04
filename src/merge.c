@@ -2154,13 +2154,10 @@ int git_merge__iterators(
 		len = diff_list->conflicts.length;
 
 		if (len>0){
-			// diffs = malloc(sizeof(git_merge_diff) * len);
 			diffs = calloc(len,sizeof(git_merge_diff));
 			i=0;
 			git_vector_foreach(&(diff_list->conflicts),i,conflict){
-			// printf("before:%p",conflict->our_entry.path);
 			memcpy(&diffs[i], conflict, sizeof(git_merge_diff));
-			// printf("after:%p",diffs[i].our_entry.path);
 
 			if (diffs[i].our_entry.path!=NULL){
 				our_path=git__strdup(diffs[i].our_entry.path);
@@ -2174,15 +2171,9 @@ int git_merge__iterators(
 				ancestor_path=git__strdup(diffs[i].ancestor_entry.path);
 			}
 
-
-
-			
 			diffs[i].our_entry.save_path=our_path;
 			diffs[i].their_entry.save_path=their_path;
 			diffs[i].ancestor_entry.save_path=ancestor_path;
-			// printf("path1:[%p:%p]",diffs[i].our_entry.path,diffs[i].our_entry.save_path);
-			// printf("path2:[%p:%p]",diffs[i].their_entry.path,diffs[i].their_entry.save_path);
-			// printf("path3:[%p:%p]",diffs[i].ancestor_entry.path,diffs[i].ancestor_entry.save_path);
 
 			}
 			conflicts_out->diffs=diffs;
@@ -2194,8 +2185,6 @@ int git_merge__iterators(
 		(opts.flags & GIT_MERGE_SKIP_REUC));
 
 done:
-
-
 	if (!given_opts || !given_opts->metric)
 		git__free(opts.metric);
 
