@@ -4,5 +4,8 @@ build/
 .*.swp
 tags
 CMakeSettings.json
-.vs
-.vscode
+.vs/
+.history/
+.idea/
+.vscode/
+Testing/

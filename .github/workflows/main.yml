@@ -48,8 +48,7 @@ jobs:
         docker build -t ${{ env.docker-registry }}/${{ github.repository }}/${{ matrix.container }}  --build-arg BASE=${{ matrix.container.base }} -f ${{ matrix.container }} .
         docker push ${{ env.docker-registry }}/${{ github.repository }}/${{ matrix.container }}
       working-directory: ${{ env.docker-config-path }}
-      if: github.event_name == 'push' 
-      # && env.docker-container-exists != 'true'
+      if: github.event_name == 'push' && env.docker-container-exists != 'true'
 
   # Run our CI/CD builds.  We build a matrix with the various build targets
   # and their details.  Then we build either in a docker container (Linux)
