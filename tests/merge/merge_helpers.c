@@ -82,6 +82,37 @@ int merge_commits_from_branches(
 	return error;
 }
 
+int merge_commits_from_branches_out_conflicts(
+	git_index **index,
+	git_merge_conflicts **conflicts_out,
+	git_repository *repo,
+	const char *ours_name,
+	const char *theirs_name,
+	git_merge_options *opts)
+{
+	git_commit *our_commit, *their_commit;
+	git_oid our_oid, their_oid;
+	git_buf branch_buf = GIT_BUF_INIT;
+	int error;
+
+	git_buf_printf(&branch_buf, "%s%s", GIT_REFS_HEADS_DIR, ours_name);
+	cl_git_pass(git_reference_name_to_id(&our_oid, repo, branch_buf.ptr));
+	cl_git_pass(git_commit_lookup(&our_commit, repo, &our_oid));
+
+	git_buf_clear(&branch_buf);
+	git_buf_printf(&branch_buf, "%s%s", GIT_REFS_HEADS_DIR, theirs_name);
+	cl_git_pass(git_reference_name_to_id(&their_oid, repo, branch_buf.ptr));
+	cl_git_pass(git_commit_lookup(&their_commit, repo, &their_oid));
+
+	error = git_merge_commits_out_conflicts(index, conflicts_out, repo, our_commit, their_commit, opts);
+
+	git_buf_dispose(&branch_buf);
+	git_commit_free(our_commit);
+	git_commit_free(their_commit);
+
+	return error;
+}
+
 int merge_branches(git_repository *repo,
 	const char *ours_branch, const char *theirs_branch,
 	git_merge_options *merge_opts, git_checkout_options *checkout_opts)
@@ -254,6 +285,39 @@ int merge_test_index(git_index *index, const struct merge_index_entry expected[]
 			return 0;
 	}
 
+	return 1;
+}
+
+int merge_test_conflicts(git_merge_conflicts *conflicts, const struct merge_conflict_path expected[], size_t expected_paths_len, size_t expected_conflicts_len){
+	size_t i, j;
+
+	if (conflicts->length != expected_conflicts_len) {
+		return 0;
+	}
+	for (i = 0; i < expected_paths_len; i++) {
+		int flag = 1;
+		for (j = 0; j < expected_conflicts_len; j++){
+			switch (expected[i].stage) {
+			case 1:
+				if (strcmp(expected[i].path, conflicts->diffs[j].ancestor_entry.path) == 0)
+					flag = 0;
+				break;
+			case 2:
+				if (strcmp(expected[i].path, conflicts->diffs[j].our_entry.path) == 0)
+					flag = 0;
+				break;
+			case 3:
+				if (strcmp(expected[i].path, conflicts->diffs[j].their_entry.path) == 0)
+					flag = 0;
+				break;
+			default:
+				break;
+			}
+		}
+
+		if (flag)
+			return 0;
+	}
 	return 1;
 }
 

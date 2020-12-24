@@ -864,6 +864,7 @@ static int merge_conflict_invoke_driver(
 	const char *name,
 	git_merge_driver *driver,
 	git_merge_diff_list *diff_list,
+    	git_merge_file_result **merge_result_out,
 	git_merge_driver_source *src)
 {
 	git_index_entry *result;
@@ -876,10 +877,10 @@ static int merge_conflict_invoke_driver(
 
 	*out = NULL;
 
-	if ((error = driver->apply(driver, &path, &mode, &buf, name, src)) < 0 ||
+	if ((error = driver->apply(driver, &path, &mode, &buf, merge_result_out, name, src)) < 0 ||
 		(error = git_repository_odb(&odb, src->repo)) < 0 ||
 		(error = git_odb_write(&oid, odb, buf.ptr, buf.size, GIT_OBJECT_BLOB)) < 0)
-		goto done;
+        	goto done;
 
 	result = git_pool_mallocz(&diff_list->pool, sizeof(git_index_entry));
 	GIT_ERROR_CHECK_ALLOC(result);
@@ -903,12 +904,12 @@ done:
 static int merge_conflict_resolve_contents(
 	int *resolved,
 	git_merge_diff_list *diff_list,
-	const git_merge_diff *conflict,
+	git_merge_diff *conflict,
 	const git_merge_options *merge_opts,
 	const git_merge_file_options *file_opts)
 {
 	git_merge_driver_source source = {0};
-	git_merge_file_result result = {0};
+	git_merge_file_result *result = NULL;
 	git_merge_driver *driver;
 	git_merge_driver__builtin builtin = {{0}};
 	git_index_entry *merge_result;
@@ -955,7 +956,7 @@ static int merge_conflict_resolve_contents(
 
 	if (driver) {
 		error = merge_conflict_invoke_driver(&merge_result, name, driver,
-			diff_list, &source);
+			diff_list, &result, &source);
 
 		if (error == GIT_PASSTHROUGH)
 			fallback = true;
@@ -963,12 +964,19 @@ static int merge_conflict_resolve_contents(
 
 	if (fallback) {
 		error = merge_conflict_invoke_driver(&merge_result, "text",
-			&git_merge_driver__text.base, diff_list, &source);
+			&git_merge_driver__text.base, diff_list, &result, &source);
 	}
 
 	if (error < 0) {
-		if (error == GIT_EMERGECONFLICT)
+		if (error == GIT_EMERGECONFLICT) {
+			// Got the merge conflict
+			memcpy(&conflict->merge_result, result, sizeof(git_merge_file_result));
+			conflict->merge_result.path = result->path ? git__strdup(result->path) : NULL;
+			// Data of ptr pointed to has been hold by conflict->merge_result.ptr,
+			// now set result->ptr to NULL, result will be released in `done`.
+			result->ptr = NULL;
 			error = 0;
+		}
 
 		goto done;
 	}
@@ -979,7 +987,7 @@ static int merge_conflict_resolve_contents(
 	*resolved = 1;
 
 done:
-	git_merge_file_result_free(&result);
+	git_merge_file_result_free(result);
 	git_odb_free(odb);
 
 	return error;
@@ -988,7 +996,7 @@ done:
 static int merge_conflict_resolve(
 	int *out,
 	git_merge_diff_list *diff_list,
-	const git_merge_diff *conflict,
+	git_merge_diff *conflict,
 	const git_merge_options *merge_opts,
 	const git_merge_file_options *file_opts)
 {
@@ -1824,7 +1832,7 @@ git_merge_diff_list *git_merge_diff_list__alloc(git_repository *repo)
 
 void git_merge_diff_list__free(git_merge_diff_list *diff_list)
 {
-	if (!diff_list)
+    	if (!diff_list)
 		return;
 
 	git_vector_free(&diff_list->staged);
@@ -1832,6 +1840,22 @@ void git_merge_diff_list__free(git_merge_diff_list *diff_list)
 	git_vector_free(&diff_list->resolved);
 	git_pool_clear(&diff_list->pool);
 	git__free(diff_list);
+}
+
+void git_merge_conflicts_free(git_merge_conflicts *conflicts) {
+	size_t i;
+
+	if (!conflicts)
+		return;
+
+	// Free merge results first
+	for (i = 0; i < conflicts->length; ++i) {
+		git_merge_diff *diff = &conflicts->diffs[i];
+		git_merge_file_result_free(&diff->merge_result);
+	}
+
+	git__free(conflicts->diffs);
+	git__free(conflicts);
 }
 
 static int merge_normalize_opts(
@@ -2053,6 +2077,7 @@ static git_iterator *iterator_given_or_empty(git_iterator **empty, git_iterator 
 
 int git_merge__iterators(
 	git_index **out,
+	git_merge_conflicts **conflicts_out,
 	git_repository *repo,
 	git_iterator *ancestor_iter,
 	git_iterator *our_iter,
@@ -2068,6 +2093,8 @@ int git_merge__iterators(
 	git_merge_diff *conflict;
 	git_vector changes;
 	size_t i;
+	size_t j; // for diffs
+	git_merge_conflicts *conflicts = NULL;
 	int error = 0;
 
 	assert(out && repo);
@@ -2107,6 +2134,13 @@ int git_merge__iterators(
 	memcpy(&changes, &diff_list->conflicts, sizeof(git_vector));
 	git_vector_clear(&diff_list->conflicts);
 
+	if (conflicts_out) {
+		conflicts = git__malloc(sizeof(git_merge_conflicts));
+		conflicts->length = 0;
+		conflicts->diffs = NULL;
+		j = 0;
+	}
+
 	git_vector_foreach(&changes, i, conflict) {
 		int resolved = 0;
 
@@ -2122,6 +2156,22 @@ int git_merge__iterators(
 			}
 
 			git_vector_insert(&diff_list->conflicts, conflict);
+
+			if (conflicts_out) {
+				conflicts->diffs = git__realloc(conflicts->diffs, (j + 1) * sizeof(git_merge_diff));
+
+				memcpy(&conflicts->diffs[j], conflict, sizeof(git_merge_diff));
+
+				conflicts->diffs[j].ancestor_entry.path = conflict->ancestor_entry.path != NULL ? git__strdup(conflict->ancestor_entry.path) : NULL;
+				conflicts->diffs[j].our_entry.path = conflict->our_entry.path != NULL ? git__strdup(conflict->our_entry.path) : NULL;
+				conflicts->diffs[j].their_entry.path = conflict->their_entry.path != NULL ? git__strdup(conflict->their_entry.path) : NULL;
+				conflicts->diffs[j].merge_result.path = conflict->merge_result.path != NULL ? git__strdup(conflict->merge_result.path) : NULL;
+
+				conflicts->length++;
+				j++;
+			}
+			if (conflicts_out)
+				*conflicts_out = conflicts;
 		}
 	}
 
@@ -2185,7 +2235,7 @@ int git_merge_trees(
 		goto done;
 
 	error = git_merge__iterators(
-		out, repo, ancestor_iter, our_iter, their_iter, merge_opts);
+		out, NULL, repo, ancestor_iter, our_iter, their_iter, merge_opts);
 
 done:
 	git_iterator_free(ancestor_iter);
@@ -2198,6 +2248,7 @@ done:
 static int merge_annotated_commits(
 	git_index **index_out,
 	git_annotated_commit **base_out,
+	git_merge_conflicts **conflicts_out,
 	git_repository *repo,
 	git_annotated_commit *our_commit,
 	git_annotated_commit *their_commit,
@@ -2249,7 +2300,7 @@ static int create_virtual_base(
 	virtual_opts.flags &= ~GIT_MERGE_FAIL_ON_CONFLICT;
 	virtual_opts.flags |= GIT_MERGE__VIRTUAL_BASE;
 
-	if ((merge_annotated_commits(&index, NULL, repo, one, two,
+	if ((merge_annotated_commits(&index, NULL, NULL, repo, one, two,
 			recursion_level + 1, &virtual_opts)) < 0)
 		return -1;
 
@@ -2366,6 +2417,7 @@ done:
 static int merge_annotated_commits(
 	git_index **index_out,
 	git_annotated_commit **base_out,
+	git_merge_conflicts **conflicts_out,
 	git_repository *repo,
 	git_annotated_commit *ours,
 	git_annotated_commit *theirs,
@@ -2388,7 +2440,7 @@ static int merge_annotated_commits(
 	if ((error = iterator_for_annotated_commit(&base_iter, base)) < 0 ||
 		(error = iterator_for_annotated_commit(&our_iter, ours)) < 0 ||
 		(error = iterator_for_annotated_commit(&their_iter, theirs)) < 0 ||
-		(error = git_merge__iterators(index_out, repo, base_iter, our_iter,
+		(error = git_merge__iterators(index_out, conflicts_out, repo, base_iter, our_iter,
 			their_iter, opts)) < 0)
 		goto done;
 
@@ -2420,7 +2472,30 @@ int git_merge_commits(
 		(error = git_annotated_commit_from_commit(&theirs, (git_commit *)their_commit)) < 0)
 		goto done;
 
-	error = merge_annotated_commits(out, &base, repo, ours, theirs, 0, opts);
+	error = merge_annotated_commits(out, &base, NULL, repo, ours, theirs, 0, opts);
+
+done:
+	git_annotated_commit_free(ours);
+	git_annotated_commit_free(theirs);
+	git_annotated_commit_free(base);
+	return error;
+}
+
+int git_merge_commits_out_conflicts(
+	git_index **out,
+	git_merge_conflicts **conflicts_out,
+	git_repository *repo,
+	const git_commit *our_commit,
+	const git_commit *their_commit,
+	const git_merge_options *opts)
+{
+	git_annotated_commit *ours = NULL, *theirs = NULL, *base = NULL;
+	int error = 0;
+	if ((error = git_annotated_commit_from_commit(&ours, (git_commit *)our_commit)) < 0 ||
+		(error = git_annotated_commit_from_commit(&theirs, (git_commit *)their_commit)) < 0)
+		goto done;
+
+	error = merge_annotated_commits(out, &base, conflicts_out, repo, ours, theirs, 0, opts);
 
 done:
 	git_annotated_commit_free(ours);
@@ -3314,7 +3389,7 @@ int git_merge(
 
 	/* TODO: octopus */
 
-	if ((error = merge_annotated_commits(&index, &base, repo, our_head,
+	if ((error = merge_annotated_commits(&index, &base, NULL, repo, our_head,
 			(git_annotated_commit *)their_heads[0], 0, merge_opts)) < 0 ||
 		(error = git_merge__check_result(repo, index)) < 0 ||
 		(error = git_merge__append_conflicts_to_merge_msg(repo, index)) < 0)
