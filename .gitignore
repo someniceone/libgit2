@@ -5,9 +5,16 @@ build/
 tags
 CMakeSettings.json
 .vs
+<<<<<<< HEAD
 
 .idea/
 .vscode/
 .history/
 Testing/
 cmake-build-debug/
+=======
+.history/
+.idea/
+.vscode/
+Testing/
+>>>>>>> origin/kvz/git_apply_to_index
