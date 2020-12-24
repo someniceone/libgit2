@@ -674,6 +674,70 @@ done:
 	return error;
 }
 
+int git_apply_to_index(
+	git_index **out,
+	git_repository *repo,
+	git_index *preimage,
+	git_diff *diff,
+	const git_apply_options *given_opts)
+{
+	git_index *postimage = NULL;
+	git_reader *pre_reader = NULL, *post_reader = NULL;
+	git_apply_options opts = GIT_APPLY_OPTIONS_INIT;
+	const git_diff_delta *delta;
+	size_t i;
+	int error = 0;
+
+	assert(out && repo && preimage && diff);
+
+	*out = NULL;
+
+	if (given_opts)
+		memcpy(&opts, given_opts, sizeof(git_apply_options));
+
+	if ((error = git_reader_for_index(&pre_reader, repo, preimage)) < 0)
+		goto done;
+
+	/*
+	 * put the current tree into the postimage as-is - the diff will
+	 * replace any entries contained therein
+	 */
+	if ((error = git_index_new(&postimage)) < 0 ||
+		(error = git_index_read_index(postimage, preimage)) < 0 ||
+		(error = git_reader_for_index(&post_reader, repo, postimage)) < 0)
+		goto done;
+
+	/*
+	 * Remove the old paths from the index before applying diffs -
+	 * we need to do a full pass to remove them before adding deltas,
+	 * in order to handle rename situations.
+	 */
+	for (i = 0; i < git_diff_num_deltas(diff); i++) {
+		delta = git_diff_get_delta(diff, i);
+
+		if (delta->status == GIT_DELTA_DELETED ||
+			delta->status == GIT_DELTA_RENAMED) {
+			if ((error = git_index_remove(postimage,
+					delta->old_file.path, 0)) < 0)
+				goto done;
+		}
+	}
+
+	if ((error = apply_deltas(repo, pre_reader, NULL, post_reader, postimage, diff, &opts)) < 0)
+		goto done;
+
+	*out = postimage;
+
+done:
+	if (error < 0)
+		git_index_free(postimage);
+
+	git_reader_free(pre_reader);
+	git_reader_free(post_reader);
+
+	return error;
+}
+
 static int git_apply__to_workdir(
 	git_repository *repo,
 	git_diff *diff,
