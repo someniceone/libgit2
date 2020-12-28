@@ -970,11 +970,14 @@ static int merge_conflict_resolve_contents(
 	if (error < 0) {
 		if (error == GIT_EMERGECONFLICT) {
 			// Got the merge conflict
-			memcpy(&conflict->merge_result, result, sizeof(git_merge_file_result));
-			conflict->merge_result.path = result->path ? git__strdup(result->path) : NULL;
-			// Data of ptr pointed to has been hold by conflict->merge_result.ptr,
-			// now set result->ptr to NULL, result will be released in `done`.
-			result->ptr = NULL;
+			if (result!=NULL){
+				memcpy(&conflict->merge_result, result, sizeof(git_merge_file_result));
+				conflict->merge_result.path = result->path ? git__strdup(result->path) : NULL;
+				// Data of ptr pointed to has been hold by conflict->merge_result.ptr,
+				// now set result->ptr to NULL, result will be released in `done`.
+				result->ptr = NULL;
+			}
+			
 			error = 0;
 		}
 
