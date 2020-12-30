@@ -976,11 +976,11 @@ static int merge_conflict_resolve_contents(
 				conflict->merge_result.automergeable = result.automergeable;
 				conflict->merge_result.len = result.len;
 				conflict->merge_result.mode = result.mode;
-				conflict->merge_result.ptr = result.ptr ? git__strdup(result.ptr) : NULL;
+				conflict->merge_result.ptr = result.ptr ;//? git__strdup(result.ptr) : NULL;
 				conflict->merge_result.path = result.path ? git__strdup(result.path) : NULL;
 				// Data of ptr pointed to has been hold by conflict->merge_result.ptr,
 				// now set result->ptr to NULL, result will be released in `done`.
-				// result.ptr = NULL;
+				result.ptr = NULL;
 			// }
 			
 			error = 0;
@@ -2170,7 +2170,6 @@ int git_merge__iterators(
 				conflicts->diffs = git__realloc(conflicts->diffs, (j + 1) * sizeof(git_merge_diff));
 
 				memcpy(&conflicts->diffs[j], conflict, sizeof(git_merge_diff));
-
 				conflicts->diffs[j].ancestor_entry.path = conflict->ancestor_entry.path != NULL ? git__strdup(conflict->ancestor_entry.path) : NULL;
 				conflicts->diffs[j].our_entry.path = conflict->our_entry.path != NULL ? git__strdup(conflict->our_entry.path) : NULL;
 				conflicts->diffs[j].their_entry.path = conflict->their_entry.path != NULL ? git__strdup(conflict->their_entry.path) : NULL;
