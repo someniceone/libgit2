@@ -1842,7 +1842,6 @@ void git_merge_diff_list__free(git_merge_diff_list *diff_list)
 {
     	if (!diff_list)
 		return;
-
 	git_vector_free(&diff_list->staged);
 	git_vector_free(&diff_list->conflicts);
 	git_vector_free(&diff_list->resolved);
@@ -2174,13 +2173,16 @@ int git_merge__iterators(
 				conflicts->diffs[j].our_entry.path = conflict->our_entry.path != NULL ? git__strdup(conflict->our_entry.path) : NULL;
 				conflicts->diffs[j].their_entry.path = conflict->their_entry.path != NULL ? git__strdup(conflict->their_entry.path) : NULL;
 				conflicts->diffs[j].merge_result.path = conflict->merge_result.path != NULL ? git__strdup(conflict->merge_result.path) : NULL;
-
+				
 				conflicts->length++;
 				j++;
 			}
 			if (conflicts_out)
 				*conflicts_out = conflicts;
 		}
+
+		git_merge_file_result_free(&conflict->merge_result);
+
 	}
 
 	error = index_from_diff_list(out, diff_list,
