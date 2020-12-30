@@ -971,11 +971,16 @@ static int merge_conflict_resolve_contents(
 		if (error == GIT_EMERGECONFLICT) {
 			// Got the merge conflict
 			// if (&result!=NULL){
-				memcpy(&conflict->merge_result, &result, sizeof(git_merge_file_result));
+				// memcpy(&conflict->merge_result, &result, sizeof(git_merge_file_result));
+				memset(&conflict->merge_result, 0x0, sizeof(git_merge_file_result));
+				conflict->merge_result.automergeable = result.automergeable;
+				conflict->merge_result.len = result.len;
+				conflict->merge_result.mode = result.mode;
+				conflict->merge_result.ptr = result.ptr ? git__strdup(result.ptr) : NULL;
 				conflict->merge_result.path = result.path ? git__strdup(result.path) : NULL;
 				// Data of ptr pointed to has been hold by conflict->merge_result.ptr,
 				// now set result->ptr to NULL, result will be released in `done`.
-				result.ptr = NULL;
+				// result.ptr = NULL;
 			// }
 			
 			error = 0;
