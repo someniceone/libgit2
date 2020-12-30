@@ -77,7 +77,10 @@ int git_merge_driver__builtin_apply(
 {
 	git_merge_driver__builtin *driver = (git_merge_driver__builtin *)self;
 	git_merge_file_options file_opts = GIT_MERGE_FILE_OPTIONS_INIT;
-	git_merge_file_result *result = git__malloc(sizeof(git_merge_file_result));
+	// git_merge_file_result *result = git__malloc(sizeof(git_merge_file_result));
+	git_merge_file_result result = {0};
+	git_merge_file_result out= {0};
+
 	int error;
 
 	GIT_UNUSED(filter_name);
@@ -88,17 +91,24 @@ int git_merge_driver__builtin_apply(
 	if (driver->favor)
 		file_opts.favor = driver->favor;
 
-	if ((error = git_merge_file_from_index(result, src->repo,
+	if ((error = git_merge_file_from_index(&result, src->repo,
 		src->ancestor, src->ours, src->theirs, &file_opts)) < 0)
 		goto done;
 
 	// if the merging is not automergeable, and the option is not GIT_MERGE_FILE_FAVOR__CONFLICTED, the error is GIT_EMERGECONFLICT
-	if (!result->automergeable &&
+	if (!result.automergeable &&
 		!(file_opts.flags & GIT_MERGE_FILE_FAVOR__CONFLICTED)) {
 		error = GIT_EMERGECONFLICT;
 		// if merge_conflict_out is not NULL, get the conflicts here
-		if (merge_conflict_out)
-			*merge_conflict_out = result;
+		if (merge_conflict_out){
+			out.automergeable = result.automergeable;
+			out.len = result.len;
+			out.mode = result.mode;
+			out.path = result.path? git__strdup(result.path):NULL;
+			out.ptr = result.ptr? git__strdup(result.ptr):NULL;
+			*merge_conflict_out = &out;
+		}
+		// 	*merge_conflict_out = result;
 		goto done;
 	}
 
@@ -112,20 +122,20 @@ int git_merge_driver__builtin_apply(
 		src->ours ? src->ours->mode : 0,
 		src->theirs ? src->theirs->mode : 0);
 
-	merged_out->ptr = (char *)result->ptr;
-	merged_out->size = result->len;
-	merged_out->asize = result->len;
-	result->ptr = NULL;
+	merged_out->ptr = (char *)result.ptr;
+	merged_out->size = result.len;
+	merged_out->asize = result.len;
+	result.ptr = NULL;
 
 done:
 	// If merge_conflict_out ponter is provided, means merge conflict result is needed,
 	// If current error is GIT_EMERGECONFLICT, means it merge conflict
 	// With this two situations, we should not release merge result.
-	if (!merge_conflict_out || error != GIT_EMERGECONFLICT){
-		git_merge_file_result_free(result);
+	// if (!merge_conflict_out || error != GIT_EMERGECONFLICT){
+	git_merge_file_result_free(&result);
 		// git__free(result);
 
-	}
+	// }
 
 	return error;
 }
