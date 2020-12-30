@@ -122,8 +122,8 @@ done:
 	// If current error is GIT_EMERGECONFLICT, means it merge conflict
 	// With this two situations, we should not release merge result.
 	if (!merge_conflict_out || error != GIT_EMERGECONFLICT){
-		// git_merge_file_result_free(result);
-		git__free(result);
+		git_merge_file_result_free(result);
+		// git__free(result);
 
 	}
 
