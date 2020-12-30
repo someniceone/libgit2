@@ -68,7 +68,7 @@ static int test_driver_apply(
 	const char **path_out,
 	uint32_t *mode_out,
 	git_buf *merged_out,
-	git_merge_file_result **merge_conflict_out,
+	git_merge_file_result *merge_conflict_out,
 	const char *filter_name,
 	const git_merge_driver_source *src)
 {
@@ -199,7 +199,7 @@ static int defer_driver_apply(
 	const char **path_out,
 	uint32_t *mode_out,
 	git_buf *merged_out,
-	git_merge_file_result **merge_conflict_out,
+	git_merge_file_result *merge_conflict_out,
 	const char *filter_name,
 	const git_merge_driver_source *src)
 {
@@ -246,7 +246,7 @@ static int conflict_driver_apply(
 	const char **path_out,
 	uint32_t *mode_out,
 	git_buf *merged_out,
-	git_merge_file_result **merge_conflict_out,
+	git_merge_file_result *merge_conflict_out,
 	const char *filter_name,
 	const git_merge_driver_source *src)
 {

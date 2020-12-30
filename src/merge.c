@@ -864,7 +864,7 @@ static int merge_conflict_invoke_driver(
 	const char *name,
 	git_merge_driver *driver,
 	git_merge_diff_list *diff_list,
-    	git_merge_file_result **merge_result_out,
+    	git_merge_file_result *merge_result_out,
 	git_merge_driver_source *src)
 {
 	git_index_entry *result;
@@ -909,7 +909,7 @@ static int merge_conflict_resolve_contents(
 	const git_merge_file_options *file_opts)
 {
 	git_merge_driver_source source = {0};
-	git_merge_file_result *result = NULL;
+	git_merge_file_result result = {0};
 	git_merge_driver *driver;
 	git_merge_driver__builtin builtin = {{0}};
 	git_index_entry *merge_result;
@@ -970,13 +970,13 @@ static int merge_conflict_resolve_contents(
 	if (error < 0) {
 		if (error == GIT_EMERGECONFLICT) {
 			// Got the merge conflict
-			if (result!=NULL){
-				memcpy(&conflict->merge_result, result, sizeof(git_merge_file_result));
-				conflict->merge_result.path = result->path ? git__strdup(result->path) : NULL;
+			// if (&result!=NULL){
+				memcpy(&conflict->merge_result, &result, sizeof(git_merge_file_result));
+				conflict->merge_result.path = result.path ? git__strdup(result.path) : NULL;
 				// Data of ptr pointed to has been hold by conflict->merge_result.ptr,
 				// now set result->ptr to NULL, result will be released in `done`.
-				result->ptr = NULL;
-			}
+				result.ptr = NULL;
+			// }
 			
 			error = 0;
 		}
@@ -990,7 +990,7 @@ static int merge_conflict_resolve_contents(
 	*resolved = 1;
 
 done:
-	git_merge_file_result_free(result);
+	git_merge_file_result_free(&result);
 	git_odb_free(odb);
 
 	return error;
@@ -1855,6 +1855,7 @@ void git_merge_conflicts_free(git_merge_conflicts *conflicts) {
 	for (i = 0; i < conflicts->length; ++i) {
 		git_merge_diff *diff = &conflicts->diffs[i];
 		git_merge_file_result_free(&diff->merge_result);
+
 	}
 
 	git__free(conflicts->diffs);
