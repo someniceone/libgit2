@@ -79,7 +79,8 @@ int git_merge_driver__builtin_apply(
 	git_merge_file_options file_opts = GIT_MERGE_FILE_OPTIONS_INIT;
 	// git_merge_file_result *result = git__malloc(sizeof(git_merge_file_result));
 	git_merge_file_result result = {0};
-	git_merge_file_result out= {0};
+	// git_merge_file_result out= {0};
+	git_merge_file_result *out=NULL;
 
 	int error;
 
@@ -101,14 +102,20 @@ int git_merge_driver__builtin_apply(
 		error = GIT_EMERGECONFLICT;
 		// if merge_conflict_out is not NULL, get the conflicts here
 		if (merge_conflict_out){
-			out.automergeable = result.automergeable;
-			out.len = result.len;
-			out.mode = result.mode;
-			out.path = result.path? git__strdup(result.path):NULL;
-			out.ptr = result.ptr? git__strdup(result.ptr):NULL;
-			*merge_conflict_out = &out;
+			out=git__malloc(sizeof(git_merge_file_result));
+			memset(out, 0x0, sizeof(git_merge_file_result));
+			// out.automergeable = result.automergeable;
+			// out.len = result.len;
+			// out.mode = result.mode;
+			// out.path = result.path? git__strdup(result.path):NULL;
+			// out.ptr = result.ptr? git__strdup(result.ptr):NULL;
+			out->automergeable = result.automergeable;
+			out->len = result.len;
+			out->mode = result.mode;
+			out->path = result.path? git__strdup(result.path):NULL;
+			out->ptr = result.ptr? git__strdup(result.ptr):NULL;
+			*merge_conflict_out = out;
 		}
-		// 	*merge_conflict_out = result;
 		goto done;
 	}
 
