@@ -1859,16 +1859,10 @@ void git_merge_conflicts_free(git_merge_conflicts *conflicts) {
 	// Free merge results first
 	for (i = 0; i < conflicts->length; ++i) {
 		git_merge_diff *diff = &conflicts->diffs[i];
-		// if (&diff->ancestor_entry.path!=NULL){
-			// git__free(diff->ancestor_entry.path);
-			// free(&diff->ancestor_entry.path);
-			git__free((char *)diff->ancestor_entry.path);
-			git__free((char *)diff->our_entry.path);
-			git__free((char *)diff->their_entry.path);
-			// diff->ancestor_entry.path=NULL;
-		// }
-		// git__free(&diff->our_entry.path);
-		// git__free(&diff->their_entry.path);
+
+		git__free((char *)diff->ancestor_entry.path);
+		git__free((char *)diff->our_entry.path);
+		git__free((char *)diff->their_entry.path);
 
 		git_merge_file_result_free(&diff->merge_result);
 
@@ -2170,15 +2164,17 @@ int git_merge__iterators(
 				goto done;
 			}
 
+		if (!conflicts_out){
+			git_merge_file_result_free(&conflict->merge_result);
+		}
+
 		if (!resolved) {
 			if ((opts.flags & GIT_MERGE_FAIL_ON_CONFLICT)) {
 				git_error_set(GIT_ERROR_MERGE, "merge conflicts exist");
 				error = GIT_EMERGECONFLICT;
-				git_merge_file_result_free(&conflict->merge_result);
 				goto done;
 			}
 
-			
 
 			if (conflicts_out) {
 				conflicts->diffs = git__realloc(conflicts->diffs, (j + 1) * sizeof(git_merge_diff));
@@ -2190,19 +2186,14 @@ int git_merge__iterators(
 				conflicts->diffs[j].merge_result.path = conflict->merge_result.path != NULL ? git__strdup(conflict->merge_result.path) : NULL;
 				conflict->merge_result.ptr=NULL;
 				git_merge_file_result_free(&conflict->merge_result);
-				
 				conflicts->length++;
 				j++;
 			}
 			if (conflicts_out){
 				*conflicts_out = conflicts;
 				
-			}else{
-				git_merge_file_result_free(&conflict->merge_result);
 			}
-
-			// git_merge_file_result_free(&conflict->merge_result);
-			
+	
 			git_vector_insert(&diff_list->conflicts, conflict);
 		}
 
