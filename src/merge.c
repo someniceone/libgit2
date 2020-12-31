@@ -977,9 +977,10 @@ static int merge_conflict_resolve_contents(
 				conflict->merge_result.len = result.len;
 				conflict->merge_result.mode = result.mode;
 				conflict->merge_result.ptr = result.ptr ;//? git__strdup(result.ptr) : NULL;
-				conflict->merge_result.path = result.path ? git__strdup(result.path) : NULL;
+				conflict->merge_result.path = result.path;// ? git__strdup(result.path) : NULL;
 				// Data of ptr pointed to has been hold by conflict->merge_result.ptr,
 				// now set result->ptr to NULL, result will be released in `done`.
+				result.path = NULL;
 				result.ptr = NULL;
 			// }
 			

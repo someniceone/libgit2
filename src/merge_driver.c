@@ -113,9 +113,10 @@ int git_merge_driver__builtin_apply(
 			merge_conflict_out->len = result.len;
 			merge_conflict_out->automergeable=result.automergeable;
 			merge_conflict_out->mode=result.mode;
-			merge_conflict_out->path=result.path? git__strdup(result.path):NULL;
+			merge_conflict_out->path=result.path;//? git__strdup(result.path):NULL;
 			merge_conflict_out->ptr=result.ptr;//? git__strdup(result.ptr):NULL;
 			result.ptr=NULL;
+			result.path=NULL;
 		}
 		goto done;
 	}
