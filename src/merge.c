@@ -2163,6 +2163,7 @@ int git_merge__iterators(
 			if ((opts.flags & GIT_MERGE_FAIL_ON_CONFLICT)) {
 				git_error_set(GIT_ERROR_MERGE, "merge conflicts exist");
 				error = GIT_EMERGECONFLICT;
+				git_merge_file_result_free(&conflict->merge_result);
 				goto done;
 			}
 
