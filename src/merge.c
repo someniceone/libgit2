@@ -2163,7 +2163,7 @@ int git_merge__iterators(
 				goto done;
 			}
 
-			git_vector_insert(&diff_list->conflicts, conflict);
+			
 
 			if (conflicts_out) {
 				conflicts->diffs = git__realloc(conflicts->diffs, (j + 1) * sizeof(git_merge_diff));
@@ -2179,9 +2179,13 @@ int git_merge__iterators(
 			}
 			if (conflicts_out)
 				*conflicts_out = conflicts;
+
+			// git_merge_file_result_free(&conflict->merge_result);
+			conflict->merge_result.ptr=NULL;
+			conflict->merge_result.path=NULL;
+			git_vector_insert(&diff_list->conflicts, conflict);
 		}
 
-		git_merge_file_result_free(&conflict->merge_result);
 
 	}
 
