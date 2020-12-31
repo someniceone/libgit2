@@ -2170,10 +2170,15 @@ int git_merge__iterators(
 				conflicts->diffs = git__realloc(conflicts->diffs, (j + 1) * sizeof(git_merge_diff));
 
 				memcpy(&conflicts->diffs[j], conflict, sizeof(git_merge_diff));
-				conflicts->diffs[j].ancestor_entry.path = conflict->ancestor_entry.path != NULL ? git__strdup(conflict->ancestor_entry.path) : NULL;
-				conflicts->diffs[j].our_entry.path = conflict->our_entry.path != NULL ? git__strdup(conflict->our_entry.path) : NULL;
-				conflicts->diffs[j].their_entry.path = conflict->their_entry.path != NULL ? git__strdup(conflict->their_entry.path) : NULL;
-				conflicts->diffs[j].merge_result.path = conflict->merge_result.path != NULL ? git__strdup(conflict->merge_result.path) : NULL;
+				// conflicts->diffs[j].ancestor_entry.path = conflict->ancestor_entry.path != NULL ? git__strdup(conflict->ancestor_entry.path) : NULL;
+				// conflicts->diffs[j].our_entry.path = conflict->our_entry.path != NULL ? git__strdup(conflict->our_entry.path) : NULL;
+				// conflicts->diffs[j].their_entry.path = conflict->their_entry.path != NULL ? git__strdup(conflict->their_entry.path) : NULL;
+				// conflicts->diffs[j].merge_result.path = conflict->merge_result.path != NULL ? git__strdup(conflict->merge_result.path) : NULL;
+				conflicts->diffs[j].ancestor_entry.path = conflict->ancestor_entry.path;conflict->ancestor_entry.path=NULL;
+				conflicts->diffs[j].our_entry.path = conflict->our_entry.path;conflict->our_entry.path=NULL;
+				conflicts->diffs[j].their_entry.path = conflict->their_entry.path;conflict->their_entry.path=NULL;
+				conflicts->diffs[j].merge_result.path = conflict->merge_result.path;conflict->merge_result.path=NULL;
+
 				
 				conflicts->length++;
 				j++;
