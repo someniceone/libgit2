@@ -2158,15 +2158,15 @@ int git_merge__iterators(
 	git_vector_foreach(&changes, i, conflict) {
 		int resolved = 0;
 
-		if ((error = merge_conflict_resolve(
-			&resolved, diff_list, conflict, &opts, &file_opts)) < 0){
-				git_merge_file_result_free(&conflict->merge_result);
-				goto done;
-			}
+		error = merge_conflict_resolve(
+			&resolved, diff_list, conflict, &opts, &file_opts);
 
 		if (!conflicts_out){
 			git_merge_file_result_free(&conflict->merge_result);
 		}
+
+		if (error < 0)
+			goto done;
 
 		if (!resolved) {
 			if ((opts.flags & GIT_MERGE_FAIL_ON_CONFLICT)) {
