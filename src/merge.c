@@ -1859,6 +1859,17 @@ void git_merge_conflicts_free(git_merge_conflicts *conflicts) {
 	// Free merge results first
 	for (i = 0; i < conflicts->length; ++i) {
 		git_merge_diff *diff = &conflicts->diffs[i];
+		// if (&diff->ancestor_entry.path!=NULL){
+			// git__free(diff->ancestor_entry.path);
+			// free(&diff->ancestor_entry.path);
+			git__free((char *)diff->ancestor_entry.path);
+			git__free((char *)diff->our_entry.path);
+			git__free((char *)diff->their_entry.path);
+			// diff->ancestor_entry.path=NULL;
+		// }
+		// git__free(&diff->our_entry.path);
+		// git__free(&diff->their_entry.path);
+
 		git_merge_file_result_free(&diff->merge_result);
 
 	}
