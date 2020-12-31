@@ -2177,12 +2177,16 @@ int git_merge__iterators(
 				conflicts->length++;
 				j++;
 			}
-			if (conflicts_out)
+			if (conflicts_out){
 				*conflicts_out = conflicts;
+				conflict->merge_result.ptr=NULL;
+				conflict->merge_result.path=NULL;
+			}else{
+				git_merge_file_result_free(&conflict->merge_result);
+			}
 
 			// git_merge_file_result_free(&conflict->merge_result);
-			conflict->merge_result.ptr=NULL;
-			conflict->merge_result.path=NULL;
+			
 			git_vector_insert(&diff_list->conflicts, conflict);
 		}
 
