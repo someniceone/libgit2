@@ -2177,16 +2177,15 @@ int git_merge__iterators(
 				conflicts->diffs[j].our_entry.path = conflict->our_entry.path != NULL ? git__strdup(conflict->our_entry.path) : NULL;
 				conflicts->diffs[j].their_entry.path = conflict->their_entry.path != NULL ? git__strdup(conflict->their_entry.path) : NULL;
 				conflicts->diffs[j].merge_result.path = conflict->merge_result.path != NULL ? git__strdup(conflict->merge_result.path) : NULL;
-				conflict->merge_result.path=NULL;
-
+				conflict->merge_result.ptr=NULL;
+				git_merge_file_result_free(&conflict->merge_result);
 				
 				conflicts->length++;
 				j++;
 			}
 			if (conflicts_out){
 				*conflicts_out = conflicts;
-				// conflict->merge_result.ptr=NULL;
-				// conflict->merge_result.path=NULL;
+				
 			}else{
 				git_merge_file_result_free(&conflict->merge_result);
 			}
