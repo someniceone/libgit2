@@ -2154,8 +2154,10 @@ int git_merge__iterators(
 		int resolved = 0;
 
 		if ((error = merge_conflict_resolve(
-			&resolved, diff_list, conflict, &opts, &file_opts)) < 0)
-			goto done;
+			&resolved, diff_list, conflict, &opts, &file_opts)) < 0){
+				git_merge_file_result_free(&conflict->merge_result);
+				goto done;
+			}
 
 		if (!resolved) {
 			if ((opts.flags & GIT_MERGE_FAIL_ON_CONFLICT)) {
