@@ -524,6 +524,14 @@ GIT_EXTERN(int) git_merge_file_from_index(
 	const git_merge_file_options *opts);
 
 /**
+ * Get the count of entries currently in the index
+ *
+ * @param conflicts an existing index object
+ * @return integer of count of current entries
+ */
+GIT_EXTERN(size_t) git_merge_conflicts_count(const git_merge_conflicts *conflicts);
+
+/**
  * Frees a `git_merge_file_result`.
  *
  * @param result The result to free or `NULL`

@@ -2529,6 +2529,22 @@ done:
 	return error;
 }
 
+// const git_merge_diff *git_merge_diff_get_by_conflicts(git_merge_conflicts *conflicts,size_t n){
+//        assert(conflicts);
+//        if (n<conflicts->length){
+//                return &conflicts->diffs[n];
+//        }else{
+//                return NULL;
+//        }
+// }
+
+size_t git_merge_conflicts_count(const git_merge_conflicts *conflicts)
+{
+	assert(conflicts);
+	return conflicts->length;
+}
+
+
 /* Merge setup / cleanup */
 
 static int write_merge_head(
