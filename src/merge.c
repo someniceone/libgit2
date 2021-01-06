@@ -984,6 +984,7 @@ static int merge_conflict_resolve_contents(
 				result.path = NULL;
 				result.ptr = NULL;
 			// }
+
 			if (conflict->ancestor_entry.path){
 				entry = &conflict->ancestor_entry;
 				merge_conflict_index_entry_adjust(&entry);

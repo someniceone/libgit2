@@ -1426,6 +1426,11 @@ out:
 	return error;
 }
 
+/*************************************************************************************
+ * Ancestor_entry, our_entry, their_entry in there are semi-finished products.
+ * Some attributes will be write while insert in to Index.
+ * In order to get the path , set flags in advance by merge_conflict_index_entry_adjust
+ */
 void merge_conflict_index_entry_adjust(git_index_entry **entry_ptr){
 	git_index_entry *entry;
 	size_t path_length;
