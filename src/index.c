@@ -851,9 +851,13 @@ size_t git_index_entrycount(const git_index *index)
 const git_index_entry *git_index_get_byindex(
 	git_index *index, size_t n)
 {
+	git_index_entry *tmp=NULL;
 	assert(index);
 	git_vector_sort(&index->entries);
-	return git_vector_get(&index->entries, n);
+	tmp = git_vector_get(&index->entries, n);
+	if (tmp)
+		printf("[c flag]%d",tmp->flags);
+	return tmp;
 }
 
 const git_index_entry *git_index_get_bypath(

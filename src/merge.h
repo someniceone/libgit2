@@ -161,6 +161,8 @@ void git_merge_diff_list__free(git_merge_diff_list *diff_list);
 
 void git_merge_conflicts_free(git_merge_conflicts *conflicts);
 
+const git_merge_diff *git_merge_diff_get_by_conflicts(git_merge_conflicts *conflicts,size_t n);
+
 /* Merge metadata setup */
 
 int git_merge__setup(

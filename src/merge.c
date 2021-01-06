@@ -971,8 +971,8 @@ static int merge_conflict_resolve_contents(
 		if (error == GIT_EMERGECONFLICT) {
 			// Got the merge conflict
 			// if (&result!=NULL){
-				// memcpy(&conflict->merge_result, &result, sizeof(git_merge_file_result));
-				memset(&conflict->merge_result, 0x0, sizeof(git_merge_file_result));
+				memcpy(&conflict->merge_result, &result, sizeof(git_merge_file_result));
+				// memset(&conflict->merge_result, 0x0, sizeof(git_merge_file_result));
 				conflict->merge_result.automergeable = result.automergeable;
 				conflict->merge_result.len = result.len;
 				conflict->merge_result.mode = result.mode;
@@ -2178,7 +2178,6 @@ int git_merge__iterators(
 
 			if (conflicts_out) {
 				conflicts->diffs = git__realloc(conflicts->diffs, (j + 1) * sizeof(git_merge_diff));
-
 				memcpy(&conflicts->diffs[j], conflict, sizeof(git_merge_diff));
 				conflicts->diffs[j].ancestor_entry.path = conflict->ancestor_entry.path != NULL ? git__strdup(conflict->ancestor_entry.path) : NULL;
 				conflicts->diffs[j].our_entry.path = conflict->our_entry.path != NULL ? git__strdup(conflict->our_entry.path) : NULL;
@@ -2529,14 +2528,14 @@ done:
 	return error;
 }
 
-// const git_merge_diff *git_merge_diff_get_by_conflicts(git_merge_conflicts *conflicts,size_t n){
-//        assert(conflicts);
-//        if (n<conflicts->length){
-//                return &conflicts->diffs[n];
-//        }else{
-//                return NULL;
-//        }
-// }
+const git_merge_diff *git_merge_diff_get_by_conflicts(git_merge_conflicts *conflicts,size_t n){
+       assert(conflicts);
+       if (n<conflicts->length){
+               return &conflicts->diffs[n];
+       }else{
+               return NULL;
+       }
+}
 
 size_t git_merge_conflicts_count(const git_merge_conflicts *conflicts)
 {
