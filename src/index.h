@@ -69,6 +69,8 @@ struct git_index_conflict_iterator {
 extern void git_index_entry__init_from_stat(
 	git_index_entry *entry, struct stat *st, bool trust_mode);
 
+extern void merge_conflict_index_entry_adjust(git_index_entry **entry_ptr);
+
 /* Index entry comparison functions for array sorting */
 extern int git_index_entry_cmp(const void *a, const void *b);
 extern int git_index_entry_icmp(const void *a, const void *b);

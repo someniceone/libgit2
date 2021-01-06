@@ -851,13 +851,9 @@ size_t git_index_entrycount(const git_index *index)
 const git_index_entry *git_index_get_byindex(
 	git_index *index, size_t n)
 {
-	git_index_entry *tmp=NULL;
 	assert(index);
 	git_vector_sort(&index->entries);
-	tmp = git_vector_get(&index->entries, n);
-	if (tmp)
-		printf("[c flag]%d",tmp->flags);
-	return tmp;
+	return  git_vector_get(&index->entries, n);
 }
 
 const git_index_entry *git_index_get_bypath(
@@ -1428,6 +1424,20 @@ out:
 	}
 
 	return error;
+}
+
+void merge_conflict_index_entry_adjust(git_index_entry **entry_ptr){
+	git_index_entry *entry;
+	size_t path_length;
+
+	assert(entry_ptr);
+
+	entry = *entry_ptr;
+
+	path_length = strlen(entry->path);
+
+	index_entry_adjust_namemask(entry, path_length);
+
 }
 
 static int index_conflict_to_reuc(git_index *index, const char *path)

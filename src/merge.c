@@ -914,6 +914,7 @@ static int merge_conflict_resolve_contents(
 	git_merge_driver__builtin builtin = {{0}};
 	git_index_entry *merge_result;
 	git_odb *odb = NULL;
+	git_index_entry *entry;
 	const char *name;
 	bool fallback = false;
 	int error;
@@ -971,8 +972,8 @@ static int merge_conflict_resolve_contents(
 		if (error == GIT_EMERGECONFLICT) {
 			// Got the merge conflict
 			// if (&result!=NULL){
-				memcpy(&conflict->merge_result, &result, sizeof(git_merge_file_result));
-				// memset(&conflict->merge_result, 0x0, sizeof(git_merge_file_result));
+				// memcpy(&conflict->merge_result, &result, sizeof(git_merge_file_result));
+				memset(&conflict->merge_result, 0x0, sizeof(git_merge_file_result));
 				conflict->merge_result.automergeable = result.automergeable;
 				conflict->merge_result.len = result.len;
 				conflict->merge_result.mode = result.mode;
@@ -983,6 +984,18 @@ static int merge_conflict_resolve_contents(
 				result.path = NULL;
 				result.ptr = NULL;
 			// }
+			if (conflict->ancestor_entry.path){
+				entry = &conflict->ancestor_entry;
+				merge_conflict_index_entry_adjust(&entry);
+			}
+			if (conflict->our_entry.path){
+				entry = &conflict->our_entry;
+				merge_conflict_index_entry_adjust(&entry);
+			}
+			if (conflict->their_entry.path){
+				entry = &conflict->their_entry;
+				merge_conflict_index_entry_adjust(&entry);
+			}
 			
 			error = 0;
 		}
