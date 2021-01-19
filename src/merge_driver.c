@@ -67,17 +67,26 @@ const git_merge_file_options *git_merge_driver_source_file_options(
 	return src->file_opts;
 }
 
+// If merge_conflict_out pointer is provided,
+// the merge conflict will be passed out by this argument,
+// if no conflict, it won't be set a value.
+// Where it calls this method and get the merge_conflict_out has responsibility to release merge_conflict_out.
 int git_merge_driver__builtin_apply(
 	git_merge_driver *self,
 	const char **path_out,
 	uint32_t *mode_out,
 	git_buf *merged_out,
+	git_merge_file_result *merge_conflict_out,
 	const char *filter_name,
 	const git_merge_driver_source *src)
 {
 	git_merge_driver__builtin *driver = (git_merge_driver__builtin *)self;
 	git_merge_file_options file_opts = GIT_MERGE_FILE_OPTIONS_INIT;
+	// git_merge_file_result *result = git__malloc(sizeof(git_merge_file_result));
 	git_merge_file_result result = {0};
+	// git_merge_file_result out= {0};
+	// git_merge_file_result *out=NULL;
+
 	int error;
 
 	GIT_UNUSED(filter_name);
@@ -92,9 +101,28 @@ int git_merge_driver__builtin_apply(
 		src->ancestor, src->ours, src->theirs, &file_opts)) < 0)
 		goto done;
 
+	// if the merging is not automergeable, and the option is not GIT_MERGE_FILE_FAVOR__CONFLICTED, the error is GIT_EMERGECONFLICT
 	if (!result.automergeable &&
 		!(file_opts.flags & GIT_MERGE_FILE_FAVOR__CONFLICTED)) {
 		error = GIT_EMERGECONFLICT;
+		// if merge_conflict_out is not NULL, get the conflicts here
+		if (merge_conflict_out){
+			// out=git__malloc(sizeof(git_merge_file_result));
+			// memset(out, 0x0, sizeof(git_merge_file_result));
+			// out->automergeable = result.automergeable;
+			// out->len = result.len;
+			// out->mode = result.mode;
+			// out->path = result.path? git__strdup(result.path):NULL;
+			// out->ptr = result.ptr? git__strdup(result.ptr):NULL;
+			memset(merge_conflict_out, 0x0, sizeof(git_merge_file_result));
+			merge_conflict_out->len = result.len;
+			merge_conflict_out->automergeable=result.automergeable;
+			merge_conflict_out->mode=result.mode;
+			merge_conflict_out->path=result.path;//? git__strdup(result.path):NULL;
+			merge_conflict_out->ptr=result.ptr;//? git__strdup(result.ptr):NULL;
+			result.ptr=NULL;
+			result.path=NULL;
+		}
 		goto done;
 	}
 
@@ -114,7 +142,12 @@ int git_merge_driver__builtin_apply(
 	result.ptr = NULL;
 
 done:
-	git_merge_file_result_free(&result);
+	// If merge_conflict_out ponter is provided, means merge conflict result is needed,
+	// If current error is GIT_EMERGECONFLICT, means it merge conflict
+	// With this two situations, we should not release merge result.
+	// if (!merge_conflict_out || error != GIT_EMERGECONFLICT)
+		git_merge_file_result_free(&result);
+
 	return error;
 }
 
@@ -123,6 +156,7 @@ static int merge_driver_binary_apply(
 	const char **path_out,
 	uint32_t *mode_out,
 	git_buf *merged_out,
+	git_merge_file_result *merge_result_out,
 	const char *filter_name,
 	const git_merge_driver_source *src)
 {
@@ -130,6 +164,7 @@ static int merge_driver_binary_apply(
 	GIT_UNUSED(path_out);
 	GIT_UNUSED(mode_out);
 	GIT_UNUSED(merged_out);
+	GIT_UNUSED(merge_result_out);
 	GIT_UNUSED(filter_name);
 	GIT_UNUSED(src);
 

@@ -108,6 +108,23 @@ GIT_EXTERN(int) git_apply_to_tree(
 	git_diff *diff,
 	const git_apply_options *options);
 
+/**
+ * Apply a `git_diff` to a `git_index`, and return the resulting image
+ * as an index.
+ *
+ * @param out the postimage of the application
+ * @param repo the repository to apply
+ * @param preimage the indx to apply the diff to
+ * @param diff the diff to apply
+ * @param options the options for the apply (or null for defaults)
+ */
+GIT_EXTERN(int) git_apply_to_index(
+	git_index **out,
+	git_repository *repo,
+	git_index *preimage,
+	git_diff *diff,
+	const git_apply_options *options);
+
 /** Possible application locations for git_apply */
 typedef enum {
 	/**

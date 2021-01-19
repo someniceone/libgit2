@@ -860,7 +860,7 @@ const git_index_entry *git_index_get_byindex(
 	GIT_ASSERT_ARG_WITH_RETVAL(index, NULL);
 
 	git_vector_sort(&index->entries);
-	return git_vector_get(&index->entries, n);
+	return  git_vector_get(&index->entries, n);
 }
 
 const git_index_entry *git_index_get_bypath(
@@ -1433,6 +1433,25 @@ out:
 	}
 
 	return error;
+}
+
+/*************************************************************************************
+ * Ancestor_entry, our_entry, their_entry in there are semi-finished products.
+ * Some attributes will be write while insert in to Index.
+ * In order to get the path , set flags in advance by merge_conflict_index_entry_adjust
+ */
+void merge_conflict_index_entry_adjust(git_index_entry **entry_ptr){
+	git_index_entry *entry;
+	size_t path_length;
+
+	assert(entry_ptr);
+
+	entry = *entry_ptr;
+
+	path_length = strlen(entry->path);
+
+	index_entry_adjust_namemask(entry, path_length);
+
 }
 
 static int index_conflict_to_reuc(git_index *index, const char *path)

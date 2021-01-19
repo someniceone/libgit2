@@ -524,6 +524,14 @@ GIT_EXTERN(int) git_merge_file_from_index(
 	const git_merge_file_options *opts);
 
 /**
+ * Get the count of entries currently in the index
+ *
+ * @param conflicts an existing index object
+ * @return integer of count of current entries
+ */
+GIT_EXTERN(size_t) git_merge_conflicts_count(const git_merge_conflicts *conflicts);
+
+/**
  * Frees a `git_merge_file_result`.
  *
  * @param result The result to free or `NULL`
@@ -575,6 +583,30 @@ GIT_EXTERN(int) git_merge_commits(
 	const git_commit *our_commit,
 	const git_commit *their_commit,
 	const git_merge_options *opts);
+
+/**
+ * Merge two commits, producing a `git_index` that reflects the result of
+ * the merge.  The index may be written as-is to the working directory
+ * or checked out.  If the index is to be converted to a tree, the caller
+ * should resolve any conflicts that arose as part of the merge.
+ *
+ * The returned index must be freed explicitly with `git_index_free`.
+ *
+ * @param out pointer to store the index result in
+ * @param repo repository that contains the given trees
+ * @param conflicts_out pass out conflicts while merging commits
+ * @param our_commit the commit that reflects the destination tree
+ * @param their_commit the commit to merge in to `our_commit`
+ * @param opts the merge tree options (or null for defaults)
+ * @return 0 on success or error code
+ */
+GIT_EXTERN(int) git_merge_commits_out_conflicts(
+        git_index **out,
+        git_merge_conflicts **conflicts_out,
+        git_repository *repo,
+        const git_commit *our_commit,
+        const git_commit *their_commit,
+        const git_merge_options *opts);
 
 /**
  * Merges the given commit(s) into HEAD, writing the results into the working

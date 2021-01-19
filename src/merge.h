@@ -123,7 +123,19 @@ typedef struct {
 	git_index_entry their_entry;
 	git_delta_t their_status;
 
+	// Hold the merge result
+	// WHo uses this has responsibility to release it
+	git_merge_file_result merge_result;
+
 } git_merge_diff;
+
+/**
+ * Hold the list of git_merge_conflict
+ */
+struct git_merge_conflicts {
+	git_merge_diff *diffs;
+	size_t length;
+};
 
 int git_merge__bases_many(
 	git_commit_list **out,
@@ -147,6 +159,10 @@ int git_merge_diff_list__find_renames(git_repository *repo, git_merge_diff_list 
 
 void git_merge_diff_list__free(git_merge_diff_list *diff_list);
 
+void git_merge_conflicts_free(git_merge_conflicts *conflicts);
+
+const git_merge_diff *git_merge_diff_get_by_conflicts(git_merge_conflicts *conflicts,size_t n);
+
 /* Merge metadata setup */
 
 int git_merge__setup(
@@ -156,12 +172,13 @@ int git_merge__setup(
 	size_t heads_len);
 
 int git_merge__iterators(
-	git_index **out,
-	git_repository *repo,
-	git_iterator *ancestor_iter,
-	git_iterator *our_iter,
-	git_iterator *their_iter,
-	const git_merge_options *given_opts);
+        git_index **out,
+        git_merge_conflicts **conflicts_out,
+        git_repository *repo,
+        git_iterator *ancestor_iter,
+        git_iterator *our_iter,
+        git_iterator *their_iter,
+        const git_merge_options *given_opts);
 
 int git_merge__check_result(git_repository *repo, git_index *index_new);
 

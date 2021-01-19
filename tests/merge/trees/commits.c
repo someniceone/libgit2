@@ -95,6 +95,47 @@ void test_merge_trees_commits__no_ancestor(void)
 	git_index_free(index);
 }
 
+void test_merge_trees_commits__conflicts_automerge(void)
+{
+	git_index *index;
+	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
+	git_merge_conflicts *conflicts;
+
+	struct merge_conflict_path paths[] = {
+		{1, "conflicting.txt"},
+		{2, "conflicting.txt"},
+		{3, "conflicting.txt"},
+	};
+
+	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, &conflicts, repo, "master", "branch", &opts));
+
+	cl_assert(merge_test_conflicts(conflicts, paths, 3, 1));
+
+	git_index_free(index);
+	git_merge_conflicts_free(conflicts);
+}
+
+void test_merge_trees_commits__conflicts_no_ancestor(void)
+{
+	git_index *index;
+	git_merge_options opts = GIT_MERGE_OPTIONS_INIT;
+	git_merge_conflicts *conflicts;
+
+	struct merge_conflict_path paths[] = {
+		{2,"automergeable.txt"},
+		{3,"automergeable.txt"},
+		{2,"conflicting.txt"},
+		{3,"conflicting.txt"},
+	};
+
+	cl_git_pass(merge_commits_from_branches_out_conflicts(&index, &conflicts, repo, "master", "unrelated", &opts));
+
+	cl_assert(merge_test_conflicts(conflicts, paths, 4, 2));
+
+	git_index_free(index);
+	git_merge_conflicts_free(conflicts);
+}
+
 void test_merge_trees_commits__df_conflict(void)
 {
 	git_index *index;
