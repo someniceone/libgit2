@@ -344,6 +344,74 @@ typedef enum {
 	GIT_MERGE_ANALYSIS_UNBORN = (1 << 3),
 } git_merge_analysis_t;
 
+/** Types of changes when files are merged from branch to branch. */
+typedef enum {
+	/* No conflict - a change only occurs in one branch. */
+	GIT_MERGE_DIFF_NONE = 0,
+
+	/* Occurs when a file is modified in both branches. */
+	GIT_MERGE_DIFF_BOTH_MODIFIED = (1 << 0),
+
+	/* Occurs when a file is added in both branches. */
+	GIT_MERGE_DIFF_BOTH_ADDED = (1 << 1),
+
+	/* Occurs when a file is deleted in both branches. */
+	GIT_MERGE_DIFF_BOTH_DELETED = (1 << 2),
+
+	/* Occurs when a file is modified in one branch and deleted in the other. */
+	GIT_MERGE_DIFF_MODIFIED_DELETED = (1 << 3),
+
+	/* Occurs when a file is renamed in one branch and modified in the other. */
+	GIT_MERGE_DIFF_RENAMED_MODIFIED = (1 << 4),
+
+	/* Occurs when a file is renamed in one branch and deleted in the other. */
+	GIT_MERGE_DIFF_RENAMED_DELETED = (1 << 5),
+
+	/* Occurs when a file is renamed in one branch and a file with the same
+	 * name is added in the other.  Eg, A->B and new file B.  Core git calls
+	 * this a "rename/delete". */
+	GIT_MERGE_DIFF_RENAMED_ADDED = (1 << 6),
+
+	/* Occurs when both a file is renamed to the same name in the ours and
+	 * theirs branches.  Eg, A->B and A->B in both.  Automergeable. */
+	GIT_MERGE_DIFF_BOTH_RENAMED = (1 << 7),
+
+	/* Occurs when a file is renamed to different names in the ours and theirs
+	 * branches.  Eg, A->B and A->C. */
+	GIT_MERGE_DIFF_BOTH_RENAMED_1_TO_2 = (1 << 8),
+
+	/* Occurs when two files are renamed to the same name in the ours and
+	 * theirs branches.  Eg, A->C and B->C. */
+	GIT_MERGE_DIFF_BOTH_RENAMED_2_TO_1 = (1 << 9),
+
+	/* Occurs when an item at a path in one branch is a directory, and an
+	 * item at the same path in a different branch is a file. */
+	GIT_MERGE_DIFF_DIRECTORY_FILE = (1 << 10),
+
+	/* The child of a folder that is in a directory/file conflict. */
+	GIT_MERGE_DIFF_DF_CHILD = (1 << 11),
+} git_merge_diff_t;
+
+/**
+ * Description of changes to one file across three trees.
+ */
+typedef struct {
+	git_merge_diff_t merge_diff_type;
+
+	git_index_entry ancestor_entry;
+
+	git_index_entry our_entry;
+	git_delta_t our_status;
+
+	git_index_entry their_entry;
+	git_delta_t their_status;
+
+	// Hold the merge result
+	// WHo uses this has responsibility to release it
+	git_merge_file_result merge_result;
+
+} git_merge_diff;
+
 /**
  * The user's stated preference for merges.
  */
@@ -532,6 +600,15 @@ GIT_EXTERN(int) git_merge_file_from_index(
 GIT_EXTERN(size_t) git_merge_conflicts_count(const git_merge_conflicts *conflicts);
 
 /**
+ * Frees a `git_merge_conflicts`.
+ *
+ * @param result The result to free or `NULL`
+ */
+GIT_EXTERN(void) git_merge_conflicts_free(git_merge_conflicts *conflicts);
+
+// void git_merge_conflicts_free(git_merge_conflicts *conflicts);
+
+/**
  * Frees a `git_merge_file_result`.
  *
  * @param result The result to free or `NULL`
@@ -632,6 +709,17 @@ GIT_EXTERN(int) git_merge(
 	size_t their_heads_len,
 	const git_merge_options *merge_opts,
 	const git_checkout_options *checkout_opts);
+
+/**
+ * Get a pointer to one of the merge diff in the conflicts
+ *
+ *
+ * @param conflicts an existing conflicts
+ * @param n the position of the merge diff
+ * @return a pointer to the merge diff; NULL if out of bounds
+ */
+GIT_EXTERN(const git_merge_diff *) git_merge_diff_get_by_conflicts(
+	git_merge_conflicts *conflicts, size_t n);
 
 /** @} */
 GIT_END_DECL
