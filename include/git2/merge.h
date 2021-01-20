@@ -602,7 +602,7 @@ GIT_EXTERN(size_t) git_merge_conflicts_count(const git_merge_conflicts *conflict
 /**
  * Frees a `git_merge_conflicts`.
  *
- * @param result The result to free or `NULL`
+ * @param conflicts The conflicts to free or `NULL`
  */
 GIT_EXTERN(void) git_merge_conflicts_free(git_merge_conflicts *conflicts);
 
