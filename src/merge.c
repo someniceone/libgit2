@@ -2572,7 +2572,9 @@ const git_merge_diff *git_merge_diff_get_by_conflicts(git_merge_conflicts *confl
 
 size_t git_merge_conflicts_count(const git_merge_conflicts *conflicts)
 {
-	assert(conflicts);
+	if (!conflicts){
+		return 0;
+	}
 	return conflicts->length;
 }
 
